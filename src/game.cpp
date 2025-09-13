@@ -1,6 +1,8 @@
 #include "game.h"
 
 #include "software_image.h"
+#include "vector.h"
+#include <ostream>
 
 Game::Game(const char* title, int window_height, int window_width)
     :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
@@ -18,11 +20,28 @@ Game::~Game()
 
 void Game::run()
 {
+    start();
+
     while(m_is_running){
         process_input();
         update();
         render();
     }
+}
+
+Vector2i Game::get_screen_surface_size() const
+{
+    if (!m_screen_surface){
+        return {};
+    }
+    return {400, 800};
+}
+
+void Game::start()
+{
+    images.push_back(
+        new SoftwareImage("../assets/images/preview.bmp", m_screen_surface)
+    );
 }
 
 void Game::process_input()
@@ -46,9 +65,12 @@ void Game::update()
 {
     // game logic
 
+    if (!images.empty()){
+        images[0]->set_size(get_screen_surface_size());
+        images[0]->draw(m_screen_surface);
+    }
 
-    SoftwareImage debug_image("../assets/images/preview.bmp", m_screen_surface);
-
+    
 }
 
 void Game::render()
@@ -86,6 +108,10 @@ bool Game::init(const char* title)
 
 void Game::clear()
 {
+    for (SoftwareImage* image: images){
+        free(image);
+    }
+
     SDL_FreeSurface(m_screen_surface);
     SDL_DestroyWindow(m_window);
     m_window = NULL;

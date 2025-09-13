@@ -1,8 +1,12 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "SDL2/SDL_surface.h"
 #include "consts.h"
 #include "commons.h"
+#include "software_image.h"
+#include "vector.h"
+#include <vector>
 
 class Game{
 public:
@@ -10,8 +14,11 @@ public:
     ~Game();
 
     void run();
+    Vector2i get_screen_surface_size() const; 
 
 private:
+    void start();
+
     void process_input();
     void update();
     void render();
@@ -25,6 +32,8 @@ private:
     bool m_is_running;
     int m_window_height;
     int m_window_width;
+
+    std::vector<SoftwareImage*> images;
 };
 
 #endif

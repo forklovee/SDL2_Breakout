@@ -41,3 +41,6 @@
 *.dwo
 
 /build
+/.cache
+/.vscode
+/CMakeFiles
