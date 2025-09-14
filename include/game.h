@@ -2,9 +2,10 @@
 #define GAME_H
 
 #include "SDL2/SDL_surface.h"
+#include "SDL_render.h"
 #include "consts.h"
 #include "commons.h"
-#include "software_image.h"
+#include "image.h"
 #include "vector.h"
 #include <vector>
 
@@ -28,12 +29,13 @@ private:
 
 private:
     SDL_Window* m_window;
+    SDL_Renderer* m_renderer;
     SDL_Surface* m_screen_surface;
     bool m_is_running;
     int m_window_height;
     int m_window_width;
 
-    std::vector<SoftwareImage*> images;
+    std::vector<Image*> images;
 };
 
 #endif

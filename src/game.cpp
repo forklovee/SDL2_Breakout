@@ -1,7 +1,9 @@
 #include "game.h"
 
+#include "SDL_error.h"
 #include "SDL_image.h"
-#include "software_image.h"
+#include "SDL_render.h"
+#include "SDL_video.h"
 #include "vector.h"
 #include <iostream>
 #include <ostream>
@@ -40,19 +42,19 @@ Vector2i Game::get_screen_surface_size() const
     if (!m_screen_surface){
         return {};
     }
-    return {400, 800};
+    return {m_window_width, m_window_height};
 }
 
 void Game::start()
 {
-    images.push_back(
-        new SoftwareImage("../assets/images/preview.bmp", m_screen_surface)
-    );
+    // images.push_back(
+    //     new Image("../assets/images/preview.bmp", m_renderer)
+    // );
 
     images.push_back(
-        new SoftwareImage("../assets/images/preview.png", m_screen_surface)
+        new Image("../assets/images/preview.bmp", m_renderer)
     );
-    images[1]->set_size({300, 400});
+    images[0]->set_size({200, 200});
 }
 
 void Game::process_input()
@@ -61,8 +63,6 @@ void Game::process_input()
     if(!SDL_PollEvent(&event)){
         return;
     }
-
-    std::cout << "Event processing." << std::endl;
 
     switch(event.type)
     {
@@ -80,17 +80,21 @@ void Game::update()
         images[0]->set_size(get_screen_surface_size());
     }
 
-    for (SoftwareImage* image: images){
-        image->draw(m_screen_surface);
-    }
+
 
 }
 
 void Game::render()
 {
     // drawing
+    SDL_RenderClear(m_renderer);
 
-    SDL_UpdateWindowSurface(m_window);
+    for (Image* image: images){
+        image->draw(m_renderer);
+    }
+
+    SDL_RenderPresent(m_renderer);
+    // SDL_UpdateWindowSurface(m_window);
 }
 
 bool Game::init(const char* title)
@@ -117,17 +121,23 @@ bool Game::init(const char* title)
         return false;
     }
 
-    m_screen_surface = SDL_GetWindowSurface(m_window);
-    SDL_FillRect(m_screen_surface, NULL, SDL_MapRGB(m_screen_surface->format, 0xff, 0xff, 0xff));
+    // m_screen_surface = SDL_GetWindowSurface(m_window);
+    // SDL_FillRect(m_screen_surface, NULL, SDL_MapRGB(m_screen_surface->format, 0xff, 0xff, 0xff));
+    // SDL_UpdateWindowSurface(m_window);
 
-    SDL_UpdateWindowSurface(m_window);
+    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
+    if (m_renderer == NULL){
+        std::cerr << "Renderer couldn't be created! SDL_Error:" << SDL_GetError() << std::endl;
+        return false;
+    }
+    SDL_SetRenderDrawColor(m_renderer, 0xff, 0xff, 0xff, 0xff);
 
     return true;
 }
 
 void Game::clear()
 {
-    for (SoftwareImage* image: images){
+    for (Image* image: images){
         free(image);
     }
 
