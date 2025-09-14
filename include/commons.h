@@ -1,11 +1,8 @@
-#ifndef COMMONS_H
-#define COMMONS_H
+#pragma once
 
-#include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #include "vector.h"
+#include <iostream>
 
-
-
-#endif

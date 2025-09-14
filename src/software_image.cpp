@@ -1,5 +1,6 @@
 #include "software_image.h"
 
+#include "SDL_image.h"
 #include "SDL_surface.h"
 #include "vector.h"
 #include <iostream>
@@ -43,9 +44,9 @@ bool SoftwareImage::load_image(const char* image_path, SDL_Surface* target_sourc
         image_surface = nullptr;
     }
 
-    SDL_Surface* new_image_surface = SDL_LoadBMP(image_path);
+    SDL_Surface* new_image_surface = IMG_Load(image_path);
     if (!new_image_surface){
-        std::cerr << "Error! Couldn't load the image!" << std::endl;
+        std::cerr << "Error! Couldn't load the "<< image_path << " image!" << IMG_GetError() << std::endl;
         return false;
     }
 

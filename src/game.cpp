@@ -1,8 +1,11 @@
 #include "game.h"
 
+#include "SDL_image.h"
 #include "software_image.h"
 #include "vector.h"
+#include <iostream>
 #include <ostream>
+#include <string>
 
 Game::Game(const char* title, int window_height, int window_width)
     :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
@@ -10,7 +13,10 @@ Game::Game(const char* title, int window_height, int window_width)
 {
     if (init(title)){
         m_is_running = true;
-
+    }
+    else{
+        std::string input_wait_line_dummy;
+        std::getline(std::cin, input_wait_line_dummy);
     }
 }
 
@@ -42,6 +48,11 @@ void Game::start()
     images.push_back(
         new SoftwareImage("../assets/images/preview.bmp", m_screen_surface)
     );
+
+    images.push_back(
+        new SoftwareImage("../assets/images/preview.png", m_screen_surface)
+    );
+    images[1]->set_size({300, 400});
 }
 
 void Game::process_input()
@@ -67,10 +78,12 @@ void Game::update()
 
     if (!images.empty()){
         images[0]->set_size(get_screen_surface_size());
-        images[0]->draw(m_screen_surface);
     }
 
-    
+    for (SoftwareImage* image: images){
+        image->draw(m_screen_surface);
+    }
+
 }
 
 void Game::render()
@@ -95,6 +108,12 @@ bool Game::init(const char* title)
     
     if (m_window == NULL){
         std::cerr << "Window couldn't be created! SDL_Error: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    int img_init_flags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_WEBP;
+    if (!(IMG_Init(img_init_flags) & IMG_INIT_PNG)){
+        std::cerr << "SDL_Image couldn't initialize PNG loader! SDL_Image_Error: " << IMG_GetError() << std::endl;
         return false;
     }
 
