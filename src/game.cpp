@@ -28,6 +28,8 @@ Game::~Game()
 
 void Game::run()
 {
+    std::cout << "Game started." << std::endl;
+
     start();
 
     while(m_is_running){
@@ -47,12 +49,12 @@ Vector2i Game::get_screen_surface_size() const
 
 void Game::start()
 {
-    // images.push_back(
-    //     new Image("../assets/images/preview.bmp", m_renderer)
-    // );
-
     images.push_back(
         new Image("../assets/images/preview.bmp", m_renderer)
+    );
+
+    images.push_back(
+        new Image("../assets/images/preview.png", m_renderer, Vector3i(0xff, 0xff, 0xff))
     );
     images[0]->set_size({200, 200});
 }
@@ -92,6 +94,8 @@ void Game::render()
     for (Image* image: images){
         image->draw(m_renderer);
     }
+
+
 
     SDL_RenderPresent(m_renderer);
     // SDL_UpdateWindowSurface(m_window);

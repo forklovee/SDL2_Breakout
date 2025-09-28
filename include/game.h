@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "SDL2/SDL_surface.h"
 #include "SDL_render.h"
@@ -37,5 +36,3 @@ private:
 
     std::vector<Image*> images;
 };
-
-#endif
