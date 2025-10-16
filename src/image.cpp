@@ -5,44 +5,53 @@
 #include "SDL_render.h"
 #include "SDL_surface.h"
 #include "vector.h"
+#include <vector>
 #include <iostream>
 
 Image::Image(const char* texture_path, SDL_Renderer* target_renderer)
     :m_image_texture(nullptr)
 {
-    if (load_texture(texture_path, target_renderer))
-    {
-        draw(target_renderer);
-    }
+    load_texture(texture_path, target_renderer);
 }
 
 Image::Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3i color_key)
     :m_image_texture(nullptr)
 {
-    if (load_texture(texture_path, target_renderer, color_key))
-    {
-        draw(target_renderer);
-    }
+    load_texture(texture_path, target_renderer, color_key);
 }
 
 Image::~Image()
 {
     clear();
-    std::cout << "Image destroy" << std::endl;
 }
 
-void Image::draw(SDL_Renderer* target_renderer)
+void Image::render(SDL_Renderer* renderer)
 {
-    SDL_RenderCopy(target_renderer, m_image_texture, NULL, NULL);
+    if (m_image_clips.empty()){
+        draw(renderer);
+        return;
+    }
+    draw_image_clips(renderer);
 }
 
-void Image::set_positon(const Vector2i& position)
+Vector2<int> Image::get_position() const
+{
+    return {m_position_and_size.x, m_position_and_size.y};
+}
+
+void Image::set_positon(const Vector2<int>& position)
 {
     m_position_and_size.x = position.x;
     m_position_and_size.y = position.y;
 }
 
-void Image::set_size(const Vector2i& size)
+Vector2<int> Image::get_size() const
+{
+    return {m_position_and_size.w, m_position_and_size.h};
+};
+
+
+void Image::set_size(const Vector2<int>& size)
 {
     m_position_and_size.w = size.x;
     m_position_and_size.h = size.y;
@@ -50,6 +59,44 @@ void Image::set_size(const Vector2i& size)
 
 SDL_Texture* Image::get_texture() const{
     return m_image_texture;
+}
+
+void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> render_position){
+    m_image_clips.push_back(new ImageClip(clip_rect, render_position));
+}
+
+void Image::remove_image_clip(const size_t clip_id){
+    ImageClip* image_clip = &get_imape_clip(clip_id);
+    m_image_clips.erase(std::next(m_image_clips.begin()+clip_id));
+    delete image_clip;
+}
+
+ImageClip& Image::get_imape_clip(const size_t clip_id){
+    return *m_image_clips[clip_id];
+}
+
+
+
+void Image::draw(SDL_Renderer* renderer, SDL_Rect* transform, SDL_Rect* clip_rect)
+{
+    if(!transform){
+        transform = &m_position_and_size;
+    }
+    
+    if(clip_rect != NULL){
+        transform->w = clip_rect->w;
+        transform->h = clip_rect->h;
+    }
+
+    SDL_RenderCopy(renderer, m_image_texture, clip_rect, transform);
+}
+
+void Image::draw_image_clips(SDL_Renderer* renderer)
+{
+    for (ImageClip* image_clip_ptr : m_image_clips){
+        
+        draw(renderer, &image_clip_ptr->destination_rect, &image_clip_ptr->clip_rect);
+    }
 }
 
 bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer)
@@ -69,6 +116,8 @@ bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer
 
 bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3i& color_key)
 {
+    std::cout << "Image: Load texture from path: " << texture_path << "." << std::endl;
+
     if (m_image_texture){
         clear();
     }
@@ -79,18 +128,19 @@ bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer
         return false;
     }
 
-    SDL_SetColorKey(image_surface, SDL_TRUE, SDL_MapRGB(image_surface->format, color_key.x, color_key.y, color_key.z));
+    SDL_SetColorKey(image_surface, SDL_TRUE, 
+        SDL_MapRGB(image_surface->format, color_key.x, color_key.y, color_key.z));
     m_image_texture = SDL_CreateTextureFromSurface(target_renderer, image_surface);
     if (!m_image_texture){
         std::cerr << "Error! Couldn't create a texture from "<< texture_path << " image!" << SDL_GetError() << std::endl;
         return false;
     }
     SDL_FreeSurface(image_surface);
-    return m_image_texture != NULL;
+    return m_image_texture != nullptr;
 }
 
 void Image::clear()
 {
     SDL_DestroyTexture(m_image_texture);
-    m_image_texture = NULL;
+    m_image_texture = nullptr;
 }

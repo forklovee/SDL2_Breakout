@@ -14,7 +14,7 @@ public:
     ~Game();
 
     void run();
-    Vector2i get_screen_surface_size() const; 
+    Vector2<int> get_screen_surface_size() const; 
 
 private:
     void start();

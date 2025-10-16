@@ -2,6 +2,57 @@
 
 #include <cmath>
 #include <ostream>
+#include <type_traits>
+
+template<typename T, 
+        typename = typename std::enable_if<std::is_same<T, int>::value ||
+                                        std::is_same<T, float>::value>::type>
+struct Vector2 {
+    T x;
+    T y;
+
+    Vector2() = default;
+    Vector2(T xy) : x(xy), y(xy) {};
+    Vector2(T x, T y) : x(x), y(y) {};
+
+    bool is_zero() const {
+        return static_cast<int>(x) == 0 && static_cast<int>(y) == 0;
+    }
+
+    Vector2 operator+(const Vector2& other_vec) const {
+        return {x + other_vec.x, y + other_vec.y};
+    }
+
+    Vector2 operator-(const Vector2& other_vec) const {
+        return {x - other_vec.x, y - other_vec.y};
+    }
+
+    Vector2 operator*(const float scale) const {
+        return {x * scale, y * scale};
+    }
+
+    Vector2 operator*(const Vector2& other_vec) const {
+        return {x * other_vec.x, y * other_vec.y};
+    }
+
+    Vector2 operator/(const float scale) const {
+        if (scale == 0.f){
+            return {x, y};
+        }
+        return {x / scale, y / scale};
+    }
+
+    Vector2 operator/(const Vector2 other_vec) const {
+        return {
+            (other_vec.x == 0.f) ? x / other_vec.x : 0.f,
+            (other_vec.y == 0.f) ? y / other_vec.y : 0.f
+        };
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Vector2& v) {
+        return os << "(" << v.x << ", " << v.y << ")";
+    }
+};
 
 struct Vector2f {
     float x{0.f};

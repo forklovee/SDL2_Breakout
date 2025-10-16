@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "SDL_error.h"
+#include "SDL_events.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
@@ -24,11 +25,12 @@ Game::Game(const char* title, int window_height, int window_width)
 
 Game::~Game()
 {
+    clear();
 }
 
 void Game::run()
 {
-    std::cout << "Game started." << std::endl;
+    std::cout << "Game started in " << get_screen_surface_size() << " window." << std::endl;
 
     start();
 
@@ -39,24 +41,38 @@ void Game::run()
     }
 }
 
-Vector2i Game::get_screen_surface_size() const
+Vector2<int> Game::get_screen_surface_size() const
 {
-    if (!m_screen_surface){
-        return {};
-    }
     return {m_window_width, m_window_height};
 }
 
 void Game::start()
 {
     images.push_back(
-        new Image("../assets/images/preview.bmp", m_renderer)
+        new Image("../assets/images/sprites.png", m_renderer, Vector3i(0, 255, 255))
     );
 
-    images.push_back(
-        new Image("../assets/images/preview.png", m_renderer, Vector3i(0xff, 0xff, 0xff))
-    );
-    images[0]->set_size({200, 200});
+    // images.push_back(
+    //     new Image("../assets/images/preview.png", m_renderer, Vector3i(0xff, 0xff, 0xff))
+    // );
+    
+    // images[0]->set_size({200, 200});
+
+    Vector2<int> screen_size = get_screen_surface_size();
+
+    Image* clip_image = images[0];
+    clip_image->add_image_clip(
+        {0, 0, 100, 100}, 
+        {0, 0});
+    clip_image->add_image_clip(
+        {100, 0, 100, 100}, 
+        {screen_size.x-100, 0});
+    clip_image->add_image_clip(
+        {0, 100, 100, 100}, 
+        {0, screen_size.y - 100});
+    clip_image->add_image_clip(
+        {100, 100, 100, 100}, 
+        {screen_size.x - 100, screen_size.y - 100});
 }
 
 void Game::process_input()
@@ -78,9 +94,9 @@ void Game::update()
 {
     // game logic
 
-    if (!images.empty()){
-        images[0]->set_size(get_screen_surface_size());
-    }
+    // if (!images.empty()){
+    //     images[0]->set_size(get_screen_surface_size());
+    // }
 
 
 
@@ -92,7 +108,7 @@ void Game::render()
     SDL_RenderClear(m_renderer);
 
     for (Image* image: images){
-        image->draw(m_renderer);
+        image->render(m_renderer);
     }
 
 
@@ -142,7 +158,7 @@ bool Game::init(const char* title)
 void Game::clear()
 {
     for (Image* image: images){
-        free(image);
+        delete image;
     }
 
     SDL_FreeSurface(m_screen_surface);
