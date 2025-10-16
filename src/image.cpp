@@ -14,7 +14,7 @@ Image::Image(const char* texture_path, SDL_Renderer* target_renderer)
     load_texture(texture_path, target_renderer);
 }
 
-Image::Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3i color_key)
+Image::Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t> color_key)
     :m_image_texture(nullptr)
 {
     load_texture(texture_path, target_renderer, color_key);
@@ -56,6 +56,12 @@ void Image::set_size(const Vector2<int>& size)
     m_position_and_size.w = size.x;
     m_position_and_size.h = size.y;
 }
+
+void Image::set_color(const Vector3<uint8_t>& color)
+{
+    SDL_SetTextureColorMod(m_image_texture, color.x, color.y, color.z);
+}
+
 
 SDL_Texture* Image::get_texture() const{
     return m_image_texture;
@@ -114,7 +120,7 @@ bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer
     return m_image_texture != NULL;
 }
 
-bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3i& color_key)
+bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t>& color_key)
 {
     std::cout << "Image: Load texture from path: " << texture_path << "." << std::endl;
 

@@ -27,7 +27,7 @@ struct ImageClip{
 class Image{
 public:
     Image(const char* texture_path, SDL_Renderer* target_renderer);
-    Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3i color_key);
+    Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t> color_key);
     ~Image();
 
     void render(SDL_Renderer* renderer);
@@ -37,6 +37,8 @@ public:
 
     Vector2<int> get_size() const;
     void set_size(const Vector2<int>& size);
+
+    void set_color(const Vector3<uint8_t>& color);
 
     SDL_Texture* get_texture() const;
 
@@ -50,7 +52,7 @@ private:
     void draw_image_clips(SDL_Renderer* renderer);
 
     bool load_texture(const char* texture_path, SDL_Renderer* target_renderer);
-    bool load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3i& color_key);
+    bool load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t>& color_key);
     void clear();
 
 private:

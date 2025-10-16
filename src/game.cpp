@@ -49,7 +49,7 @@ Vector2<int> Game::get_screen_surface_size() const
 void Game::start()
 {
     images.push_back(
-        new Image("../assets/images/sprites.png", m_renderer, Vector3i(0, 255, 255))
+        new Image("../assets/images/sprites.png", m_renderer, Vector3<uint8_t>(0, 255, 255))
     );
 
     // images.push_back(
@@ -73,6 +73,8 @@ void Game::start()
     clip_image->add_image_clip(
         {100, 100, 100, 100}, 
         {screen_size.x - 100, screen_size.y - 100});
+
+    clip_image->set_color({255, 128, 64});
 }
 
 void Game::process_input()
