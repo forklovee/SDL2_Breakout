@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDL2/SDL_rect.h"
+#include "SDL_blendmode.h"
 #include "vector.h"
 #include <vector>
 #include <cstddef>
@@ -38,7 +39,8 @@ public:
     Vector2<int> get_size() const;
     void set_size(const Vector2<int>& size);
 
-    void set_color(const Vector3<uint8_t>& color);
+    void set_color(const Vector3<uint8_t>& color, const uint8_t& alpha);
+    void set_blend_mode(SDL_BlendMode blend_mode);
 
     SDL_Texture* get_texture() const;
 

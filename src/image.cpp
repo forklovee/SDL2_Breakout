@@ -57,10 +57,17 @@ void Image::set_size(const Vector2<int>& size)
     m_position_and_size.h = size.y;
 }
 
-void Image::set_color(const Vector3<uint8_t>& color)
+void Image::set_color(const Vector3<uint8_t>& color, const uint8_t& alpha)
 {
     SDL_SetTextureColorMod(m_image_texture, color.x, color.y, color.z);
+    SDL_SetTextureAlphaMod(m_image_texture, alpha);
 }
+
+void Image::set_blend_mode(SDL_BlendMode blend_mode)
+{
+    SDL_SetTextureBlendMode(m_image_texture, blend_mode);
+}
+
 
 
 SDL_Texture* Image::get_texture() const{

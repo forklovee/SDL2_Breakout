@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include "SDL_blendmode.h"
 #include "SDL_error.h"
 #include "SDL_events.h"
 #include "SDL_image.h"
@@ -74,7 +75,8 @@ void Game::start()
         {100, 100, 100, 100}, 
         {screen_size.x - 100, screen_size.y - 100});
 
-    clip_image->set_color({255, 128, 64});
+    clip_image->set_color({255, 128, 64}, 128);
+    clip_image->set_blend_mode(SDL_BLENDMODE_BLEND);
 }
 
 void Game::process_input()
