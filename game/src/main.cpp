@@ -2,7 +2,7 @@
 #include <stdio.h>
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
-#include "game.h"
+#include "core/game.h"
 
 #ifdef _WIN32
 #include <windows.h>

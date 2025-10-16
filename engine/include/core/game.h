@@ -2,10 +2,8 @@
 
 #include "SDL2/SDL_surface.h"
 #include "SDL_render.h"
-#include "consts.h"
-#include "commons.h"
-#include "image.h"
-#include "vector.h"
+#include "graphics/image/image.h"
+#include "math/vector.h"
 #include <vector>
 
 class Game{

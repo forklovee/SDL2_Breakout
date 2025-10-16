@@ -2,7 +2,7 @@
 
 #include "SDL2/SDL_rect.h"
 #include "SDL_blendmode.h"
-#include "vector.h"
+#include "math/vector.h"
 #include <vector>
 #include <cstddef>
 
@@ -44,7 +44,7 @@ public:
 
     SDL_Texture* get_texture() const;
 
-    void add_image_clip(SDL_Rect clip_rect, Vector2<int> render_position);
+    void add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position = {});
     void remove_image_clip(const size_t clip_id);
     ImageClip& get_imape_clip(const size_t clip_id);
 
@@ -59,7 +59,8 @@ private:
 
 private:
     SDL_Texture* m_image_texture;
-    SDL_Rect m_position_and_size;
+    Vector2<int> m_position;
+    Vector2<int> m_size;
 
     std::vector<ImageClip*> m_image_clips;
 };

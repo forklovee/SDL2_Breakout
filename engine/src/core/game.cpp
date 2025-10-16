@@ -1,4 +1,4 @@
-#include "game.h"
+#include "core/game.h"
 
 #include "SDL_blendmode.h"
 #include "SDL_error.h"
@@ -6,7 +6,7 @@
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
-#include "vector.h"
+#include "math/vector.h"
 #include <iostream>
 #include <ostream>
 #include <string>

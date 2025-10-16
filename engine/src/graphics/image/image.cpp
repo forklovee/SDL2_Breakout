@@ -1,10 +1,11 @@
-#include "image.h"
+#include "graphics/image/image.h"
 
 #include "SDL_error.h"
 #include "SDL_image.h"
+#include "SDL_rect.h"
 #include "SDL_render.h"
 #include "SDL_surface.h"
-#include "vector.h"
+#include "math/vector.h"
 #include <vector>
 #include <iostream>
 
@@ -36,25 +37,25 @@ void Image::render(SDL_Renderer* renderer)
 
 Vector2<int> Image::get_position() const
 {
-    return {m_position_and_size.x, m_position_and_size.y};
+    return m_position;
 }
 
 void Image::set_positon(const Vector2<int>& position)
 {
-    m_position_and_size.x = position.x;
-    m_position_and_size.y = position.y;
+    m_position.x = position.x;
+    m_position.y = position.y;
 }
 
 Vector2<int> Image::get_size() const
 {
-    return {m_position_and_size.w, m_position_and_size.h};
+    return m_size;
 };
 
 
 void Image::set_size(const Vector2<int>& size)
 {
-    m_position_and_size.w = size.x;
-    m_position_and_size.h = size.y;
+    m_size.x = size.x;
+    m_size.x = size.y;
 }
 
 void Image::set_color(const Vector3<uint8_t>& color, const uint8_t& alpha)
@@ -74,8 +75,8 @@ SDL_Texture* Image::get_texture() const{
     return m_image_texture;
 }
 
-void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> render_position){
-    m_image_clips.push_back(new ImageClip(clip_rect, render_position));
+void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position){
+    m_image_clips.push_back(new ImageClip(clip_rect, m_position + local_position));
 }
 
 void Image::remove_image_clip(const size_t clip_id){
@@ -93,7 +94,8 @@ ImageClip& Image::get_imape_clip(const size_t clip_id){
 void Image::draw(SDL_Renderer* renderer, SDL_Rect* transform, SDL_Rect* clip_rect)
 {
     if(!transform){
-        transform = &m_position_and_size;
+        SDL_Rect new_transform = SDL_Rect{m_position.x, m_position.y, m_size.x, m_size.y};
+        transform = &new_transform;
     }
     
     if(clip_rect != NULL){
