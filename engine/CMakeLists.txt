@@ -1,19 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
 
-file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
-    src/*.cpp
-    src/**/*.cpp
-)
-file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
-    include/*.h
-    include/**/*.h
-)
-
 add_library(engine STATIC)
 
 target_sources(engine PRIVATE
     src/core/game.cpp
     src/graphics/image/image.cpp
+    src/graphics/image/animated_image.cpp
 )
 
 target_include_directories(engine

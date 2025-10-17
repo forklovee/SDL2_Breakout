@@ -5,20 +5,22 @@
 #include "SDL_rect.h"
 #include "SDL_render.h"
 #include "SDL_surface.h"
-#include "math/vector.h"
 #include <vector>
 #include <iostream>
 
-Image::Image(const char* texture_path, SDL_Renderer* target_renderer)
+Image::Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
     :m_image_texture(nullptr)
 {
-    load_texture(texture_path, target_renderer);
-}
+    std::cout << "Image!" << size << std::endl;
 
-Image::Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t> color_key)
-    :m_image_texture(nullptr)
-{
-    load_texture(texture_path, target_renderer, color_key);
+    if (use_color_key){
+        load_texture(texture_path, target_renderer, color_key);
+    }
+    else{
+        load_texture(texture_path, target_renderer);
+    }
+    set_size(size);
+    std::cout << "Image!" << get_size() << std::endl;
 }
 
 Image::~Image()
@@ -32,21 +34,25 @@ void Image::render(SDL_Renderer* renderer)
         draw(renderer);
         return;
     }
-    draw_image_clips(renderer);
+    draw_all_image_clips(renderer);
 }
 
-Vector2<int> Image::get_position() const
+SDL_Rect Image::get_transform() const 
+{ 
+    return {m_position.x, m_position.y, m_size.x, m_size.y}; 
+}
+
+const Vector2<int>& Image::get_position() const 
 {
     return m_position;
 }
 
-void Image::set_positon(const Vector2<int>& position)
+void Image::set_position(const Vector2<int>& position)
 {
-    m_position.x = position.x;
-    m_position.y = position.y;
+    m_position = position;
 }
 
-Vector2<int> Image::get_size() const
+const Vector2<int>& Image::get_size() const
 {
     return m_size;
 };
@@ -54,8 +60,7 @@ Vector2<int> Image::get_size() const
 
 void Image::set_size(const Vector2<int>& size)
 {
-    m_size.x = size.x;
-    m_size.x = size.y;
+    m_size = size;
 }
 
 void Image::set_color(const Vector3<uint8_t>& color, const uint8_t& alpha)
@@ -76,7 +81,7 @@ SDL_Texture* Image::get_texture() const{
 }
 
 void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position){
-    m_image_clips.push_back(new ImageClip(clip_rect, m_position + local_position));
+    m_image_clips.push_back(ImageClip(clip_rect, m_position + local_position));
 }
 
 void Image::remove_image_clip(const size_t clip_id){
@@ -86,36 +91,44 @@ void Image::remove_image_clip(const size_t clip_id){
 }
 
 ImageClip& Image::get_imape_clip(const size_t clip_id){
-    return *m_image_clips[clip_id];
+    return m_image_clips[clip_id];
 }
 
 
 
-void Image::draw(SDL_Renderer* renderer, SDL_Rect* transform, SDL_Rect* clip_rect)
+void Image::draw(SDL_Renderer* renderer, SDL_Rect* clip_rect)
 {
-    if(!transform){
-        SDL_Rect new_transform = SDL_Rect{m_position.x, m_position.y, m_size.x, m_size.y};
-        transform = &new_transform;
-    }
-    
+    SDL_Rect transform = get_transform();   
     if(clip_rect != NULL){
-        transform->w = clip_rect->w;
-        transform->h = clip_rect->h;
+        transform.w = clip_rect->w;
+        transform.h = clip_rect->h;
     }
 
-    SDL_RenderCopy(renderer, m_image_texture, clip_rect, transform);
+    SDL_RenderCopy(renderer, m_image_texture, clip_rect, &transform);
 }
 
-void Image::draw_image_clips(SDL_Renderer* renderer)
+void Image::draw_all_image_clips(SDL_Renderer* renderer)
 {
-    for (ImageClip* image_clip_ptr : m_image_clips){
-        
-        draw(renderer, &image_clip_ptr->destination_rect, &image_clip_ptr->clip_rect);
+    for (ImageClip& image_clip : m_image_clips)
+    {
+        draw_image_clip(renderer, image_clip);
     }
+}
+
+void Image::draw_image_clip(SDL_Renderer* renderer, ImageClip& image_clip)
+{
+    SDL_RenderCopy(renderer, m_image_texture, &image_clip.clip_rect, &image_clip.destination_rect);
+}
+
+void Image::draw_image_clip(SDL_Renderer* renderer, uint8_t image_clip_id)
+{
+    draw_image_clip(renderer, m_image_clips[image_clip_id]);
 }
 
 bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer)
 {
+    std::cout << "Image: Load texture from path: " << texture_path << "." << std::endl;
+
     if (m_image_texture){
         clear();
     }
@@ -156,6 +169,8 @@ bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer
 
 void Image::clear()
 {
+    std::cout << "Clear Image" << std::endl;
+
     SDL_DestroyTexture(m_image_texture);
     m_image_texture = nullptr;
 }

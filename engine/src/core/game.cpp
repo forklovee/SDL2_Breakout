@@ -1,12 +1,15 @@
 #include "core/game.h"
 
+#include "math/vector.h"
+#include "graphics/image/animated_image.h"
+
+
 #include "SDL_blendmode.h"
 #include "SDL_error.h"
 #include "SDL_events.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
-#include "math/vector.h"
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -49,8 +52,12 @@ Vector2<int> Game::get_screen_surface_size() const
 
 void Game::start()
 {
+    // images.push_back(
+    //     new Image(m_renderer, "../assets/images/sprites.png", Vector2<int>(200, 200), true, Vector3<uint8_t>(0, 255, 255))
+    // );
+
     images.push_back(
-        new Image("../assets/images/sprites.png", m_renderer, Vector3<uint8_t>(0, 255, 255))
+        new AnimatedImage(m_renderer, "../assets/images/foo.png", Vector2<int>(64, 205), 4)
     );
 
     // images.push_back(
@@ -59,24 +66,24 @@ void Game::start()
     
     // images[0]->set_size({200, 200});
 
-    Vector2<int> screen_size = get_screen_surface_size();
+    // Vector2<int> screen_size = get_screen_surface_size();
 
-    Image* clip_image = images[0];
-    clip_image->add_image_clip(
-        {0, 0, 100, 100}, 
-        {0, 0});
-    clip_image->add_image_clip(
-        {100, 0, 100, 100}, 
-        {screen_size.x-100, 0});
-    clip_image->add_image_clip(
-        {0, 100, 100, 100}, 
-        {0, screen_size.y - 100});
-    clip_image->add_image_clip(
-        {100, 100, 100, 100}, 
-        {screen_size.x - 100, screen_size.y - 100});
+    // Image* clip_image = images[0];
+    // clip_image->add_image_clip(
+    //     {0, 0, 100, 100}, 
+    //     {0, 0});
+    // clip_image->add_image_clip(
+    //     {100, 0, 100, 100}, 
+    //     {screen_size.x-100, 0});
+    // clip_image->add_image_clip(
+    //     {0, 100, 100, 100}, 
+    //     {0, screen_size.y - 100});
+    // clip_image->add_image_clip(
+    //     {100, 100, 100, 100}, 
+    //     {screen_size.x - 100, screen_size.y - 100});
 
-    clip_image->set_color({255, 128, 64}, 128);
-    clip_image->set_blend_mode(SDL_BLENDMODE_BLEND);
+    // clip_image->set_color({255, 128, 64}, 128);
+    // clip_image->set_blend_mode(SDL_BLENDMODE_BLEND);
 }
 
 void Game::process_input()
@@ -149,7 +156,8 @@ bool Game::init(const char* title)
     // SDL_FillRect(m_screen_surface, NULL, SDL_MapRGB(m_screen_surface->format, 0xff, 0xff, 0xff));
     // SDL_UpdateWindowSurface(m_window);
 
-    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
+    m_renderer = SDL_CreateRenderer(m_window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (m_renderer == NULL){
         std::cerr << "Renderer couldn't be created! SDL_Error:" << SDL_GetError() << std::endl;
         return false;

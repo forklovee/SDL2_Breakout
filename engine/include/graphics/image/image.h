@@ -27,17 +27,20 @@ struct ImageClip{
 
 class Image{
 public:
-    Image(const char* texture_path, SDL_Renderer* target_renderer);
-    Image(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t> color_key);
-    ~Image();
+    Image() = default;
+    Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> size, 
+        bool use_color_key = false, Vector3<uint8_t> color_key = {});
+    virtual ~Image();
 
-    void render(SDL_Renderer* renderer);
+    virtual void render(SDL_Renderer* renderer);
 
-    Vector2<int> get_position() const;
-    void set_positon(const Vector2<int>& position);
+    SDL_Rect get_transform() const;
 
-    Vector2<int> get_size() const;
-    void set_size(const Vector2<int>& size);
+    const Vector2<int>& get_position() const;
+    virtual void set_position(const Vector2<int>& position);
+
+    const Vector2<int>& get_size() const;
+    virtual void set_size(const Vector2<int>& size);
 
     void set_color(const Vector3<uint8_t>& color, const uint8_t& alpha);
     void set_blend_mode(SDL_BlendMode blend_mode);
@@ -49,18 +52,24 @@ public:
     ImageClip& get_imape_clip(const size_t clip_id);
 
 
-private:
-    void draw(SDL_Renderer* renderer, SDL_Rect* transform = nullptr, SDL_Rect* clip_rect = nullptr);
-    void draw_image_clips(SDL_Renderer* renderer);
+protected:
+    void draw(SDL_Renderer* renderer, SDL_Rect* clip_rect = nullptr);
+    
+    void draw_all_image_clips(SDL_Renderer* renderer);
+    void draw_image_clip(SDL_Renderer* renderer, ImageClip& image_clip);
+    void draw_image_clip(SDL_Renderer*, uint8_t image_clip_id);
 
+private:
     bool load_texture(const char* texture_path, SDL_Renderer* target_renderer);
     bool load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t>& color_key);
     void clear();
+
+protected:
+    std::vector<ImageClip> m_image_clips;
 
 private:
     SDL_Texture* m_image_texture;
     Vector2<int> m_position;
     Vector2<int> m_size;
 
-    std::vector<ImageClip*> m_image_clips;
 };
