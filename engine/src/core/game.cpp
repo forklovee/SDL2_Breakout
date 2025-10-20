@@ -1,15 +1,17 @@
 #include "core/game.h"
 
+#include "graphics/image/image.h"
+#include "graphics/image/text_image.h"
 #include "math/vector.h"
 #include "graphics/image/animated_image.h"
 
 
-#include "SDL_blendmode.h"
 #include "SDL_error.h"
 #include "SDL_events.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
+#include <SDL_ttf.h>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -52,38 +54,24 @@ Vector2<int> Game::get_screen_surface_size() const
 
 void Game::start()
 {
-    // images.push_back(
-    //     new Image(m_renderer, "../assets/images/sprites.png", Vector2<int>(200, 200), true, Vector3<uint8_t>(0, 255, 255))
-    // );
+    TTF_Font* font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 28);
+    if (font == NULL){
+        std::cerr << "Font not loaded :(" << std::endl;
+    }
+    fonts.push_back(font);
 
-    images.push_back(
-        new AnimatedImage(m_renderer, "../assets/images/foo.png", Vector2<int>(64, 205), 4)
-    );
 
-    // images.push_back(
-    //     new Image("../assets/images/preview.png", m_renderer, Vector3i(0xff, 0xff, 0xff))
-    // );
+    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], Vector2<int>{300, 100}, Vector3<uint8_t>{0}, 255);
     
-    // images[0]->set_size({200, 200});
+    Image* image = new Image(m_renderer, "../assets/images/preview.png", {200, 150});
+    image->set_position({100});
 
-    // Vector2<int> screen_size = get_screen_surface_size();
+    AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", Vector2<int>(64, 205), 4);
+    animated_image->set_position({100});
 
-    // Image* clip_image = images[0];
-    // clip_image->add_image_clip(
-    //     {0, 0, 100, 100}, 
-    //     {0, 0});
-    // clip_image->add_image_clip(
-    //     {100, 0, 100, 100}, 
-    //     {screen_size.x-100, 0});
-    // clip_image->add_image_clip(
-    //     {0, 100, 100, 100}, 
-    //     {0, screen_size.y - 100});
-    // clip_image->add_image_clip(
-    //     {100, 100, 100, 100}, 
-    //     {screen_size.x - 100, screen_size.y - 100});
-
-    // clip_image->set_color({255, 128, 64}, 128);
-    // clip_image->set_blend_mode(SDL_BLENDMODE_BLEND);
+    images.push_back(animated_image);
+    images.push_back(image);
+    images.push_back(text_image);
 }
 
 void Game::process_input()
@@ -121,10 +109,7 @@ void Game::render()
         image->render(m_renderer);
     }
 
-
-
     SDL_RenderPresent(m_renderer);
-    // SDL_UpdateWindowSurface(m_window);
 }
 
 bool Game::init(const char* title)
@@ -151,10 +136,6 @@ bool Game::init(const char* title)
         return false;
     }
 
-    // m_screen_surface = SDL_GetWindowSurface(m_window);
-    // SDL_FillRect(m_screen_surface, NULL, SDL_MapRGB(m_screen_surface->format, 0xff, 0xff, 0xff));
-    // SDL_UpdateWindowSurface(m_window);
-
     m_renderer = SDL_CreateRenderer(m_window, -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (m_renderer == NULL){
@@ -163,18 +144,33 @@ bool Game::init(const char* title)
     }
     SDL_SetRenderDrawColor(m_renderer, 0xff, 0xff, 0xff, 0xff);
 
+    if (TTF_Init() < 0)
+    {
+        std::cerr << "SDL_ttf couldn't initialize! TTF_Error: " << TTF_GetError() << std::endl;
+        return false;
+    }
+
     return true;
 }
 
 void Game::clear()
 {
-    for (Image* image: images){
+    for (Image* image: images)
+    {
         delete image;
+    }
+
+    for (TTF_Font* font_ptr: fonts)
+    {
+        TTF_CloseFont(font_ptr);
     }
 
     SDL_FreeSurface(m_screen_surface);
     SDL_DestroyWindow(m_window);
     m_window = NULL;
     m_screen_surface = NULL;
+
+    TTF_Quit();
+    IMG_Quit();
     SDL_Quit();
 }

@@ -4,6 +4,7 @@
 #include "SDL_render.h"
 #include "graphics/image/image.h"
 #include "math/vector.h"
+#include <SDL_ttf.h>
 #include <vector>
 
 class Game{
@@ -32,5 +33,7 @@ private:
     int m_window_height;
     int m_window_width;
 
+    std::vector<TTF_Font*> fonts;
     std::vector<Image*> images;
+
 };

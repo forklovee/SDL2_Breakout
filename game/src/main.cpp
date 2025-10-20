@@ -1,6 +1,8 @@
+#define SDL_MAIN_HANDLED
+
 #include <cstdio>
 #include <stdio.h>
-#define SDL_MAIN_HANDLED
+
 #include <SDL2/SDL.h>
 #include "core/game.h"
 
@@ -18,8 +20,9 @@ int main(int argc, char* argv[]){
         freopen_s(&fp, "CONIN$", "r", stdin);
     #endif
 
-    Game game("Breakout", 600, 400);
-    game.run();
+    Game* game = new Game("Breakout", 600, 400);
+    game->run();
+    delete game;
 
     return 0;
 }

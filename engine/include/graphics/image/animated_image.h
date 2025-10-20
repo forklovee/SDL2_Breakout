@@ -13,7 +13,6 @@ public:
     void render(SDL_Renderer* renderer) override;
 
     void set_size(const Vector2<int>& size) override;
-
     void set_position(const Vector2<int>& position) override;
 
 private:

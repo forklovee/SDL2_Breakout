@@ -6,10 +6,11 @@
 #include "SDL_render.h"
 #include "SDL_surface.h"
 #include <vector>
+#include <cmath>
 #include <iostream>
 
 Image::Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
-    :m_image_texture(nullptr)
+    :m_image_texture(nullptr), m_position(0), m_rotation(0.0), m_flip_mode(SDL_FLIP_NONE)
 {
     std::cout << "Image!" << size << std::endl;
 
@@ -60,7 +61,8 @@ const Vector2<int>& Image::get_size() const
 
 void Image::set_size(const Vector2<int>& size)
 {
-    m_size = size;
+    m_size.x = abs(size.x);
+    m_size.y = abs(size.y);
 }
 
 const SDL_Point& Image::get_pivot_point() const

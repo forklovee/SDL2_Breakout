@@ -63,6 +63,7 @@ struct Vector3 {
 
     Vector3() = default;
     Vector3(T x, T y, T z) : x(x), y(y), z(z) {};
+    Vector3(T xyz) : x(xyz), y(xyz), z(xyz) {};
 
     Vector3 operator+(const Vector3& other_vec) const {
         return {x + other_vec.x, y + other_vec.y, z + other_vec.z};

@@ -63,7 +63,7 @@ public:
 
 
 protected:
-    void draw(SDL_Renderer* renderer, SDL_Rect* clip_rect = nullptr);
+    virtual void draw(SDL_Renderer* renderer, SDL_Rect* clip_rect = nullptr);
     
     void draw_all_image_clips(SDL_Renderer* renderer);
     void draw_image_clip(SDL_Renderer* renderer, ImageClip& image_clip);
@@ -75,10 +75,10 @@ private:
     void clear();
 
 protected:
+    SDL_Texture* m_image_texture;
     std::vector<ImageClip> m_image_clips;
 
 private:
-    SDL_Texture* m_image_texture;
     Vector2<int> m_position;
     Vector2<int> m_size;
 

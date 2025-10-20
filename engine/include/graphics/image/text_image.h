@@ -1,0 +1,31 @@
+#pragma once
+
+#include "graphics/image/image.h"
+
+#include <SDL_ttf.h>
+#include <SDL_render.h>
+#include <cstdint>
+
+class TextImage: public Image
+{
+public:
+    TextImage() = default;
+    TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr, Vector2<int> size, 
+        Vector3<uint8_t> color, uint8_t alpha = 255);
+
+    void set_text(const std::string& text);
+    const std::string& get_text() const;
+
+protected:
+    void draw(SDL_Renderer* renderer, SDL_Rect* clip_rect) override;
+
+
+private:
+    void load_text_texture(SDL_Renderer* target_renderer, TTF_Font* font_ptr);
+
+private:
+    std::string text;
+    Vector3<uint8_t> color;
+    uint8_t alpha;
+
+};
