@@ -6,11 +6,12 @@
 
 #include "math/vector.h"
 #include <SDL_ttf.h>
+#include <cstdint>
 #include <string>
 
 namespace Engine{
 
-class Button: Object2D
+class Button: public Object2D
 {
 public:
     Button() = default;
@@ -25,8 +26,14 @@ public:
     void set_position(const Vector2<int>& position) override;
 
 private:
-    
     std::string m_text;
+
+    Vector3<uint8_t> m_default_color{255};
+    uint8_t m_default_alpha{255};
+    Vector3<uint8_t> m_hover_color{255};
+    uint8_t m_hover_alpha{255};
+    Vector3<uint8_t> m_pressed_color{255};
+    uint8_t m_pressed_alpha{255};
 
     TextImage m_button_text_image;
     Image m_background_image;

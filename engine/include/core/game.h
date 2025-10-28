@@ -1,10 +1,12 @@
 #pragma once
 
+#include "graphics/object2d.h"
 #include "math/vector.h"
 
 #include "SDL2/SDL_surface.h"
 #include "SDL_render.h"
 #include <SDL_ttf.h>
+#include <memory>
 #include <vector>
 
 namespace Engine{
@@ -44,8 +46,7 @@ private:
     int m_window_width;
 
     std::vector<TTF_Font*> fonts;
-    std::vector<Image*> images;
-    std::vector<Button*> buttons;
+    std::vector<Object2D*> objects;
 
 };
 

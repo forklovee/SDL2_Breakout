@@ -6,6 +6,8 @@
 #include "SDL_blendmode.h"
 #include "math/vector.h"
 #include <SDL_render.h>
+#include <cstdint>
+#include <memory>
 #include <vector>
 #include <cstddef>
 
@@ -14,6 +16,8 @@ class SDL_Renderer;
 class SDL_Texture;
 
 namespace Engine {
+
+using SDLTexturePtr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
 
 struct ImageClip{
     SDL_Rect destination_rect;
@@ -32,7 +36,8 @@ struct ImageClip{
 
 class Image: public Object2D{
 public:
-    Image() = default;
+    Image();
+    Image(Vector2<int> position, Vector2<int> size);
     Image(SDL_Renderer* target_renderer, const char* texture_path,
         Vector2<int> position, Vector2<int> size, 
         bool use_color_key = false, Vector3<uint8_t> color_key = {});
@@ -64,8 +69,11 @@ private:
     void clear();
 
 protected:
-    SDL_Texture* m_image_texture;
+    SDLTexturePtr m_image_texture = {nullptr, nullptr};
     std::vector<ImageClip> m_image_clips;
+
+    Vector3<uint8_t> m_color{255, 255, 255};
+    uint8_t m_alpha{255};
 
 };
 

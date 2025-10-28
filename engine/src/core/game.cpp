@@ -67,19 +67,16 @@ void Game::start()
     fonts.push_back(font);
 
 
-    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], Vector2<int>{300, 100}, Vector3<uint8_t>{0}, 255);
-    
+    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], {}, Vector2<int>{300, 100}, Vector3<uint8_t>{0}, 255);
     Image* image = new Image(m_renderer, "../assets/images/preview.png", {100}, {200, 150});
+    AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", {200, 400}, {64, 205}, 4);
 
-    AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", {200}, {64, 205}, 4);
-
-    images.push_back(animated_image);
-    images.push_back(image);
-    images.push_back(text_image);
-
+    objects.push_back(animated_image);
+    objects.push_back(image);
+    objects.push_back(text_image);
 
     Button* button = new Button(m_renderer, "Button!", {200, 64});
-    buttons.push_back(button);
+    objects.push_back(button);
 
 }
 
@@ -95,6 +92,10 @@ void Game::process_input()
         case SDL_QUIT:
             m_is_running = false;
             break;
+    }
+
+    for (Object2D* object: objects){
+        object->handle_event(&event);
     }
 }
 
@@ -114,13 +115,8 @@ void Game::render()
     // drawing
     SDL_RenderClear(m_renderer);
 
-    for (Image* image: images){
-        image->render(m_renderer);
-    }
-
-    for (Button* button: buttons)
-    {
-        button->render(m_renderer);
+    for (Object2D* object: objects){
+        object->render(m_renderer);
     }
 
     SDL_RenderPresent(m_renderer);
@@ -169,20 +165,15 @@ bool Game::init(const char* title)
 
 void Game::clear()
 {
-    for (Image* image: images)
+    for (Object2D* object: objects)
     {
-        delete image;
+        delete object;
     }
 
     TTF_CloseFont(Engine::default_font);
     for (TTF_Font* font_ptr: fonts)
     {
         TTF_CloseFont(font_ptr);
-    }
-
-    for (Button* button_ptr: buttons)
-    {
-        delete button_ptr;
     }
 
     SDL_FreeSurface(m_screen_surface);

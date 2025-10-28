@@ -21,7 +21,7 @@ public:
     Object2D(Vector2<int> position, Vector2<int> size);
     virtual ~Object2D();
 
-    virtual void render(SDL_Renderer* renderer) = 0;
+    virtual void render(SDL_Renderer* renderer);
     virtual void handle_event(SDL_Event* event);
 
     SDL_Rect get_transform() const;

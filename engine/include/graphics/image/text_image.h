@@ -12,8 +12,9 @@ namespace Engine {
 class TextImage: public Image
 {
 public:
-    TextImage() = default;
-    TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr, Vector2<int> size = {32}, 
+    TextImage();
+    TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr,
+        Vector2<int> position = {}, Vector2<int> size = {32}, 
         Vector3<uint8_t> color = {0}, uint8_t alpha = 255);
 
     void set_text(const std::string& text);

@@ -1,4 +1,6 @@
 #include "graphics/object2d.h"
+#include <SDL_events.h>
+#include <iostream>
 
 namespace Engine{
 
@@ -13,9 +15,43 @@ Object2D::~Object2D()
 
 }
 
+void Object2D::render(SDL_Renderer* renderer)
+{
+
+}
+
+
 void Object2D::handle_event(SDL_Event* event)
 {
-    
+    bool mouse_inside = false;
+
+    if (event->type == SDL_MOUSEMOTION || event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP)
+    {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+
+        if (x > m_position.x && x < m_position.x + m_size.x &&
+            y > m_position.y && y < m_position.y + m_size.y)
+        {
+            mouse_inside = true;
+        }
+
+        m_mouse_state = mouse_inside ? MouseState::MOUSE_OVER : MouseState::MOUSE_OUT;
+    }
+
+    if (!mouse_inside)
+    {
+        return;
+    }
+
+    if (event->type == SDL_MOUSEBUTTONDOWN)
+    {
+        m_mouse_state = MouseState::MOUSE_BUTTON_PRESSED;
+    }
+    else if (event->type == SDL_MOUSEBUTTONUP)
+    {
+        m_mouse_state = MouseState::MOUSE_BUTTON_RELEASED;
+    }
 }
 
 SDL_Rect Object2D::get_transform() const

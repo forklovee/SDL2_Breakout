@@ -10,20 +10,16 @@
 
 namespace Engine {
 
-TextImage::TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr, Vector2<int> size, Vector3<uint8_t> color, uint8_t alpha)
-: text(text), color(color), alpha(alpha)
+TextImage::TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr, 
+    Vector2<int> position, Vector2<int> size, Vector3<uint8_t> color, uint8_t alpha)
+: Image(position, size), text(text), color(color), alpha(alpha)
 {
     load_text_texture(target_renderer, font_ptr);
-    set_position(0);
-    set_size(size);
-
-    std::cout << "TextImage!" << get_size() << std::endl;
 }
 
 void TextImage::draw(SDL_Renderer* renderer, SDL_Rect* clip_rect)
 {
     Image::draw(renderer, clip_rect);
-
 }
 
 
@@ -35,8 +31,9 @@ void TextImage::load_text_texture(SDL_Renderer* target_renderer, TTF_Font* font_
         std::cerr << "Unable to render text surface! Error: " << TTF_GetError() << std::endl;
         return;
     }
-    m_image_texture = SDL_CreateTextureFromSurface(target_renderer, text_surface);
-    SDL_SetTextureBlendMode(m_image_texture, SDL_BLENDMODE_BLEND);
+    SDL_Texture* raw_texture_ptr = SDL_CreateTextureFromSurface(target_renderer, text_surface);
+    m_image_texture = SDLTexturePtr(raw_texture_ptr, SDL_DestroyTexture);
+    SDL_SetTextureBlendMode(m_image_texture.get(), SDL_BLENDMODE_BLEND);
 
     SDL_FreeSurface(text_surface);
 }
