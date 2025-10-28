@@ -1,11 +1,21 @@
 #pragma once
 
+#include "math/vector.h"
+
 #include "SDL2/SDL_surface.h"
 #include "SDL_render.h"
-#include "graphics/image/image.h"
-#include "math/vector.h"
 #include <SDL_ttf.h>
 #include <vector>
+
+namespace Engine{
+
+class Image;
+class Button;
+
+static const char* ASSET_PATH = "../game/assets/";
+extern TTF_Font* default_font;
+
+// extern const TTF_Font* default_font;
 
 class Game{
 public:
@@ -35,5 +45,8 @@ private:
 
     std::vector<TTF_Font*> fonts;
     std::vector<Image*> images;
+    std::vector<Button*> buttons;
 
 };
+
+}

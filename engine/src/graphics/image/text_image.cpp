@@ -8,6 +8,7 @@
 #include <SDL_ttf.h>
 #include <iostream>
 
+namespace Engine {
 
 TextImage::TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr, Vector2<int> size, Vector3<uint8_t> color, uint8_t alpha)
 : text(text), color(color), alpha(alpha)
@@ -48,4 +49,6 @@ void TextImage::set_text(const std::string& text)
 const std::string& TextImage::get_text() const
 {
     return text;
+}
+
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "graphics/object2d.h"
+
 #include "SDL2/SDL_rect.h"
 #include "SDL_blendmode.h"
 #include "math/vector.h"
@@ -10,6 +12,8 @@
 class SDL_Surface;
 class SDL_Renderer;
 class SDL_Texture;
+
+namespace Engine {
 
 struct ImageClip{
     SDL_Rect destination_rect;
@@ -26,31 +30,16 @@ struct ImageClip{
     }
 };
 
-class Image{
+class Image: public Object2D{
 public:
     Image() = default;
-    Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> size, 
+    Image(SDL_Renderer* target_renderer, const char* texture_path,
+        Vector2<int> position, Vector2<int> size, 
         bool use_color_key = false, Vector3<uint8_t> color_key = {});
+    
     virtual ~Image();
 
     virtual void render(SDL_Renderer* renderer);
-
-    SDL_Rect get_transform() const;
-
-    const Vector2<int>& get_position() const;
-    virtual void set_position(const Vector2<int>& position);
-
-    const Vector2<int>& get_size() const;
-    virtual void set_size(const Vector2<int>& size);
-
-    const SDL_Point& get_pivot_point() const;
-    virtual void set_pivot_point(const SDL_Point& pivot_point);
-
-    const double& get_rotation() const;
-    virtual void set_rotation(const double& rotation);
-
-    const SDL_RendererFlip& get_flip_mode() const;
-    void set_flip_mode(const SDL_RendererFlip& flip_mode);
 
     void set_color(const Vector3<uint8_t>& color, const uint8_t& alpha);
     void set_blend_mode(SDL_BlendMode blend_mode);
@@ -78,13 +67,6 @@ protected:
     SDL_Texture* m_image_texture;
     std::vector<ImageClip> m_image_clips;
 
-private:
-    Vector2<int> m_position;
-    Vector2<int> m_size;
-
-    SDL_Point m_pivot_point;
-    double m_rotation;
-    
-    SDL_RendererFlip m_flip_mode;
-
 };
+
+}

@@ -1,14 +1,17 @@
 #include "graphics/image/animated_image.h"
 #include <iostream>
 
-AnimatedImage::AnimatedImage(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> size,
+namespace Engine {
+
+AnimatedImage::AnimatedImage(SDL_Renderer* target_renderer, const char* texture_path,
+    Vector2<int> position, Vector2<int> size,
     uint8_t frames, bool use_color_key, Vector3<uint8_t> color_key)
-    : Image(target_renderer, texture_path, size, use_color_key, color_key)
+    : Image(target_renderer, texture_path, position, size, use_color_key, color_key),
+        m_frames(frames)
 {
     std::cout << "AnimatedImage!" << get_size() << std::endl;
 
-    this->frames = frames;
-    for(uint8_t clip_id = 0; clip_id < this->frames; clip_id++){
+    for(uint8_t clip_id = 0; clip_id < m_frames; clip_id++){
         add_image_clip(SDL_Rect{
             get_size().x * clip_id,0,
             get_size().x, get_size().y
@@ -20,12 +23,12 @@ void AnimatedImage::render(SDL_Renderer* renderer)
 {
     Image::render(renderer);
 
-    current_frame++;
-    uint8_t animation_frame = current_frame / frames;
-    if (animation_frame >= frames)
+    m_current_frame++;
+    uint8_t animation_frame = m_current_frame / m_frames;
+    if (animation_frame >= m_frames)
     {
         animation_frame = 0;
-        current_frame = 0;
+        m_current_frame = 0;
     }
 
     ImageClip& image_clip = m_image_clips[animation_frame];
@@ -61,4 +64,6 @@ void AnimatedImage::set_position(const Vector2<int>& position)
         image_clip_ptr.destination_rect.x = position.x;
         image_clip_ptr.destination_rect.y = position.y;
     }
+}
+
 }

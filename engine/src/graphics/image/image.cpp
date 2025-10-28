@@ -1,27 +1,24 @@
 #include "graphics/image/image.h"
+#include "graphics/object2d.h"
 
 #include "SDL_error.h"
 #include "SDL_image.h"
 #include "SDL_rect.h"
 #include "SDL_render.h"
 #include "SDL_surface.h"
-#include <vector>
-#include <cmath>
 #include <iostream>
 
-Image::Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
-    :m_image_texture(nullptr), m_position(0), m_rotation(0.0), m_flip_mode(SDL_FLIP_NONE)
-{
-    std::cout << "Image!" << size << std::endl;
+namespace Engine {
 
+Image::Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> position, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
+    :Object2D(position, size), m_image_texture(nullptr)
+{
     if (use_color_key){
         load_texture(texture_path, target_renderer, color_key);
     }
     else{
         load_texture(texture_path, target_renderer);
     }
-    set_size(size);
-    std::cout << "Image!" << get_size() << std::endl;
 }
 
 Image::~Image()
@@ -37,64 +34,6 @@ void Image::render(SDL_Renderer* renderer)
     }
     draw_all_image_clips(renderer);
 }
-
-SDL_Rect Image::get_transform() const 
-{ 
-    return {m_position.x, m_position.y, m_size.x, m_size.y}; 
-}
-
-const Vector2<int>& Image::get_position() const 
-{
-    return m_position;
-}
-
-void Image::set_position(const Vector2<int>& position)
-{
-    m_position = position;
-}
-
-const Vector2<int>& Image::get_size() const
-{
-    return m_size;
-};
-
-
-void Image::set_size(const Vector2<int>& size)
-{
-    m_size.x = abs(size.x);
-    m_size.y = abs(size.y);
-}
-
-const SDL_Point& Image::get_pivot_point() const
-{
-    return m_pivot_point;
-}
-
-void Image::set_pivot_point(const SDL_Point& pivot_point)
-{
-    m_pivot_point = pivot_point;
-}
-
-const double& Image::get_rotation() const
-{
-    return m_rotation;
-}
-
-void Image::set_rotation(const double& rotation)
-{
-    m_rotation = rotation;
-}
-
-const SDL_RendererFlip& Image::get_flip_mode() const
-{
-    return m_flip_mode;
-}
-
-void Image::set_flip_mode(const SDL_RendererFlip& flip_mode)
-{
-    m_flip_mode = flip_mode;
-}
-
 
 void Image::set_color(const Vector3<uint8_t>& color, const uint8_t& alpha)
 {
@@ -118,9 +57,7 @@ void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position){
 }
 
 void Image::remove_image_clip(const size_t clip_id){
-    ImageClip* image_clip = &get_imape_clip(clip_id);
-    m_image_clips.erase(std::next(m_image_clips.begin()+clip_id));
-    delete image_clip;
+    m_image_clips.erase(m_image_clips.begin()+clip_id);
 }
 
 ImageClip& Image::get_imape_clip(const size_t clip_id){
@@ -137,8 +74,13 @@ void Image::draw(SDL_Renderer* renderer, SDL_Rect* clip_rect)
         transform.h = clip_rect->h;
     }
 
+    if(m_image_texture == nullptr){
+        SDL_RenderDrawRect(renderer, &transform);
+        return;
+    }
+
     SDL_RenderCopyEx(renderer, m_image_texture, clip_rect, &transform,
-        get_rotation(), &get_pivot_point(), get_flip_mode());
+        get_rotation(), &get_pivot_point(), get_flipmode());
 }
 
 void Image::draw_all_image_clips(SDL_Renderer* renderer)
@@ -152,7 +94,7 @@ void Image::draw_all_image_clips(SDL_Renderer* renderer)
 void Image::draw_image_clip(SDL_Renderer* renderer, ImageClip& image_clip)
 {
     SDL_RenderCopyEx(renderer, m_image_texture, &image_clip.clip_rect, &image_clip.destination_rect,
-        get_rotation(), &get_pivot_point(), get_flip_mode());
+        get_rotation(), &get_pivot_point(), get_flipmode());
 }
 
 void Image::draw_image_clip(SDL_Renderer* renderer, uint8_t image_clip_id)
@@ -208,4 +150,6 @@ void Image::clear()
 
     SDL_DestroyTexture(m_image_texture);
     m_image_texture = nullptr;
+}
+
 }

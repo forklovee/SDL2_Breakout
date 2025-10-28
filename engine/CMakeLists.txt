@@ -4,9 +4,12 @@ add_library(engine STATIC)
 
 target_sources(engine PRIVATE
     src/core/game.cpp
+
+    src/graphics/object2d.cpp
     src/graphics/image/image.cpp
     src/graphics/image/animated_image.cpp
     src/graphics/image/text_image.cpp
+    src/ui/button/button.cpp
 )
 
 target_include_directories(engine

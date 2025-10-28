@@ -5,16 +5,20 @@
 #include "math/vector.h"
 #include "graphics/image/animated_image.h"
 
-
 #include "SDL_error.h"
 #include "SDL_events.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
+#include "ui/button/button.h"
 #include <SDL_ttf.h>
 #include <iostream>
 #include <ostream>
 #include <string>
+
+namespace Engine {
+
+TTF_Font* default_font = nullptr;
 
 Game::Game(const char* title, int window_height, int window_width)
     :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
@@ -54,6 +58,8 @@ Vector2<int> Game::get_screen_surface_size() const
 
 void Game::start()
 {
+    Engine::default_font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 9);
+
     TTF_Font* font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 28);
     if (font == NULL){
         std::cerr << "Font not loaded :(" << std::endl;
@@ -63,15 +69,18 @@ void Game::start()
 
     TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], Vector2<int>{300, 100}, Vector3<uint8_t>{0}, 255);
     
-    Image* image = new Image(m_renderer, "../assets/images/preview.png", {200, 150});
-    image->set_position({100});
+    Image* image = new Image(m_renderer, "../assets/images/preview.png", {100}, {200, 150});
 
-    AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", Vector2<int>(64, 205), 4);
-    animated_image->set_position({100});
+    AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", {200}, {64, 205}, 4);
 
     images.push_back(animated_image);
     images.push_back(image);
     images.push_back(text_image);
+
+
+    Button* button = new Button(m_renderer, "Button!", {200, 64});
+    buttons.push_back(button);
+
 }
 
 void Game::process_input()
@@ -107,6 +116,11 @@ void Game::render()
 
     for (Image* image: images){
         image->render(m_renderer);
+    }
+
+    for (Button* button: buttons)
+    {
+        button->render(m_renderer);
     }
 
     SDL_RenderPresent(m_renderer);
@@ -160,9 +174,15 @@ void Game::clear()
         delete image;
     }
 
+    TTF_CloseFont(Engine::default_font);
     for (TTF_Font* font_ptr: fonts)
     {
         TTF_CloseFont(font_ptr);
+    }
+
+    for (Button* button_ptr: buttons)
+    {
+        delete button_ptr;
     }
 
     SDL_FreeSurface(m_screen_surface);
@@ -173,4 +193,6 @@ void Game::clear()
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+}
+
 }
