@@ -101,6 +101,12 @@ void Game::process_input()
 void Game::update()
 {
     // game logic
+    
+    Object2D* object_ptr = objects[0];
+    Vector2<int> direction = input.get_vector("right", "left", "down", "up");
+    if (object_ptr){
+        object_ptr->set_position(object_ptr->get_position() + direction);
+    }
 
     // if (!images.empty()){
     //     images[0]->set_size(get_screen_surface_size());

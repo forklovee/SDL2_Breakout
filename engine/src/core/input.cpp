@@ -72,10 +72,11 @@ bool InputManager::is_action_just_pressed(const std::string& action_name){
     return false;
   }
   const SDL_Keycode& keycode = m_action_bindings.at(action_name);
-  if (!m_key_states.contains(keycode) || !m_last_key_states.contains(keycode)){
+  if (!m_key_states.contains(keycode)){
     return false;
   }
-  return !m_key_states.at(keycode) && m_last_key_states.at(keycode);
+  return m_key_states.at(keycode) && 
+        (!m_last_key_states.contains(keycode) || !m_last_key_states.at(keycode));
 }
 
 bool InputManager::is_action_released(const std::string& action_name){
@@ -106,6 +107,15 @@ Vector2<int32_t>& InputManager::get_mouse_position(){
   return m_mouse_position;
 }
 
+const Vector2<int> InputManager::get_vector(const std::string& x_axis_pos_action, const std::string& x_axis_neg_action,
+    const std::string& y_axis_pos_action, const std::string& y_axis_neg_action){
+  return {
+    is_action_pressed(x_axis_pos_action) - is_action_pressed(x_axis_neg_action),
+    is_action_pressed(y_axis_pos_action) - is_action_pressed(y_axis_neg_action),
+  };
+}
+
+
 bool InputManager::is_mouse_button_pressed(bool secondary){
   const Uint8 target_button = secondary ? 3 : 1;
   if (!m_mouse_states.contains(target_button)){
@@ -116,11 +126,12 @@ bool InputManager::is_mouse_button_pressed(bool secondary){
 
 bool InputManager::is_mouse_button_just_pressed(bool secondary){
   const Uint8 target_button = secondary ? 3 : 1;
-  if (!m_mouse_states.contains(target_button) || !m_last_mouse_states.contains(target_button)){
+  if (!m_mouse_states.contains(target_button)){
     return false;
   }
 
-  return m_mouse_states.at(target_button) && !m_last_mouse_states.at(target_button);
+  return m_mouse_states.at(target_button) && 
+    (!m_last_mouse_states.contains(target_button) || !m_last_mouse_states.at(target_button));
 }
 
 bool InputManager::is_mouse_button_released(bool secondary){
@@ -137,7 +148,7 @@ bool InputManager::is_mouse_button_just_released(bool secondary){
     return false;
   }
 
-  return m_mouse_states.at(target_button) && !m_last_mouse_states.at(target_button);
+  return !m_mouse_states.at(target_button) && m_last_mouse_states.at(target_button);
 }
 
 
