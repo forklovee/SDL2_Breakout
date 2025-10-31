@@ -41,8 +41,11 @@ public:
     const SDL_RendererFlip& get_flipmode() const;
     virtual void set_flipmode(const SDL_RendererFlip& flipmode);
 
+    const bool& get_process_events() const;
+    virtual void set_process_events(const bool& process_events);
+
 protected:
-    Vector2<int> m_position{};    
+    Vector2<int> m_position{};
     Vector2<int> m_size{};
 
     SDL_Point m_pivot_point{};
@@ -50,6 +53,8 @@ protected:
 
     SDL_RendererFlip m_flipmode{SDL_FLIP_NONE};
 
+    bool m_process_events{false};
+    bool m_mouse_inside{false};
     MouseState m_mouse_state{MouseState::MOUSE_OUT};
 };
 

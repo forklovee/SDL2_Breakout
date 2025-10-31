@@ -83,7 +83,7 @@ void Game::start()
     objects.push_back(image);
     objects.push_back(text_image);
 
-    Button* button = new Button(m_renderer, "Button!", {200, 64});
+    Button* button = new Button(m_renderer, "Button!", true, {200, 64});
     objects.push_back(button);
 
 }

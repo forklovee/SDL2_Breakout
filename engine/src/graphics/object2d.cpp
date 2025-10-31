@@ -6,7 +6,7 @@
 namespace Engine{
 
 Object2D::Object2D(Vector2<int> position, Vector2<int> size) :
-    m_position(position), m_size(size)
+    m_position(position), m_size(size), m_process_events{false}
 {
 
 }
@@ -24,7 +24,11 @@ void Object2D::render(SDL_Renderer* renderer)
 
 void Object2D::handle_event(const SDL_Event& event)
 {
-    bool mouse_inside = false;
+    if (!m_process_events){
+        return;
+    }
+
+    m_mouse_inside = false;
 
     InputManager& input = InputManager::get_instance();
 
@@ -32,12 +36,12 @@ void Object2D::handle_event(const SDL_Event& event)
     if (mouse_position.x > m_position.x && mouse_position.x < m_position.x + m_size.x &&
         mouse_position.y > m_position.y && mouse_position.y < m_position.y + m_size.y)
     {
-        mouse_inside = true;
+        m_mouse_inside = true;
     }
 
-    m_mouse_state = mouse_inside ? MouseState::MOUSE_OVER : MouseState::MOUSE_OUT;
+    m_mouse_state = m_mouse_inside ? MouseState::MOUSE_OVER : MouseState::MOUSE_OUT;
 
-    if (!mouse_inside)
+    if (!m_mouse_inside)
     {
         return;
     }
@@ -110,6 +114,17 @@ const SDL_RendererFlip& Object2D::get_flipmode() const
 void Object2D::set_flipmode(const SDL_RendererFlip& flipmode)
 {
     m_flipmode = flipmode;
+}
+
+
+const bool& Object2D::get_process_events() const
+{
+    return m_process_events;
+}
+
+void Object2D::set_process_events(const bool& process_events)
+{
+    m_process_events = process_events;
 }
 
 };

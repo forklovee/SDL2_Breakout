@@ -120,7 +120,7 @@ bool InputManager::is_mouse_button_just_pressed(bool secondary){
     return false;
   }
 
-  return m_mouse_states.at(target_button) && !m_last_key_states.at(target_button);
+  return m_mouse_states.at(target_button) && !m_last_mouse_states.at(target_button);
 }
 
 bool InputManager::is_mouse_button_released(bool secondary){
@@ -137,7 +137,7 @@ bool InputManager::is_mouse_button_just_released(bool secondary){
     return false;
   }
 
-  return m_mouse_states.at(target_button) && !m_last_key_states.at(target_button);
+  return m_mouse_states.at(target_button) && !m_last_mouse_states.at(target_button);
 }
 
 
