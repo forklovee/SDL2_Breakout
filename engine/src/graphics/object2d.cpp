@@ -1,4 +1,5 @@
 #include "graphics/object2d.h"
+#include "core/input.h"
 #include <SDL_events.h>
 #include <iostream>
 
@@ -21,34 +22,31 @@ void Object2D::render(SDL_Renderer* renderer)
 }
 
 
-void Object2D::handle_event(SDL_Event* event)
+void Object2D::handle_event(const SDL_Event& event)
 {
     bool mouse_inside = false;
 
-    if (event->type == SDL_MOUSEMOTION || event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP)
+    InputManager& input = InputManager::get_instance();
+
+    Vector2<int>& mouse_position = input.get_mouse_position();
+    if (mouse_position.x > m_position.x && mouse_position.x < m_position.x + m_size.x &&
+        mouse_position.y > m_position.y && mouse_position.y < m_position.y + m_size.y)
     {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-
-        if (x > m_position.x && x < m_position.x + m_size.x &&
-            y > m_position.y && y < m_position.y + m_size.y)
-        {
-            mouse_inside = true;
-        }
-
-        m_mouse_state = mouse_inside ? MouseState::MOUSE_OVER : MouseState::MOUSE_OUT;
+        mouse_inside = true;
     }
+
+    m_mouse_state = mouse_inside ? MouseState::MOUSE_OVER : MouseState::MOUSE_OUT;
 
     if (!mouse_inside)
     {
         return;
     }
 
-    if (event->type == SDL_MOUSEBUTTONDOWN)
+    if (input.is_mouse_button_pressed(false))
     {
         m_mouse_state = MouseState::MOUSE_BUTTON_PRESSED;
     }
-    else if (event->type == SDL_MOUSEBUTTONUP)
+    else
     {
         m_mouse_state = MouseState::MOUSE_BUTTON_RELEASED;
     }

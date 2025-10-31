@@ -47,11 +47,6 @@ void Button::render(SDL_Renderer* m_renderer)
   m_button_text_image.render(m_renderer);
 }
 
-void Button::handle_event(SDL_Event* event)
-{
-  Object2D::handle_event(event);
-}
-
 
 void Button::set_position(const Vector2<int>& position)
 {

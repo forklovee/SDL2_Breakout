@@ -22,7 +22,7 @@ public:
     virtual ~Object2D();
 
     virtual void render(SDL_Renderer* renderer);
-    virtual void handle_event(SDL_Event* event);
+    virtual void handle_event(const SDL_Event& event);
 
     SDL_Rect get_transform() const;
 

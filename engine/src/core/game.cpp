@@ -1,5 +1,6 @@
 #include "core/game.h"
 
+#include "core/input.h"
 #include "graphics/image/image.h"
 #include "graphics/image/text_image.h"
 #include "math/vector.h"
@@ -11,6 +12,7 @@
 #include "SDL_render.h"
 #include "SDL_video.h"
 #include "ui/button/button.h"
+#include <SDL_keycode.h>
 #include <SDL_ttf.h>
 #include <iostream>
 #include <ostream>
@@ -18,6 +20,7 @@
 
 namespace Engine {
 
+InputManager& input = InputManager::get_instance();
 TTF_Font* default_font = nullptr;
 
 Game::Game(const char* title, int window_height, int window_width)
@@ -58,6 +61,11 @@ Vector2<int> Game::get_screen_surface_size() const
 
 void Game::start()
 {
+    input.bind_action("up", SDLK_w);    
+    input.bind_action("down", SDLK_s);
+    input.bind_action("left", SDLK_a);
+    input.bind_action("right", SDLK_d);
+
     Engine::default_font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 9);
 
     TTF_Font* font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 28);
@@ -82,20 +90,11 @@ void Game::start()
 
 void Game::process_input()
 {
-    SDL_Event event;
-    if(!SDL_PollEvent(&event)){
-        return;
-    }
-
-    switch(event.type)
-    {
-        case SDL_QUIT:
-            m_is_running = false;
-            break;
-    }
-
+    SDL_Event& event = input.update();
+    m_is_running = !input.is_quit_requested();
+    
     for (Object2D* object: objects){
-        object->handle_event(&event);
+        object->handle_event(event);
     }
 }
 
