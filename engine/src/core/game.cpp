@@ -13,9 +13,13 @@
 #include "SDL_video.h"
 #include "ui/button/button.h"
 #include <SDL_keycode.h>
+#include <SDL_stdinc.h>
+#include <SDL_timer.h>
 #include <SDL_ttf.h>
+#include <iomanip>
 #include <iostream>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 namespace Engine {
@@ -79,7 +83,7 @@ void Game::start()
     fonts.push_back(font);
 
 
-    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], {}, Vector2<int>{300, 100}, Vector3<uint8_t>{0}, 255);
+    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], {}, Vector2<int>{380, 30}, Vector3<uint8_t>{0}, 255);
     Image* image = new Image(m_renderer, "../assets/images/preview.png", {100}, {200, 150});
     AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", {200, 400}, {64, 205}, 4);
 
@@ -105,6 +109,14 @@ void Game::process_input()
 void Game::update()
 {
     // game logic
+    Uint32 last_run_time = m_run_time;
+    m_run_time = SDL_GetTicks();
+    Uint32 delta_time = m_run_time - last_run_time;
+
+    std::stringstream delta_text{""};
+    delta_text << "FPS: " << std::setw(8) << 1000.f/delta_time << "  |  Run time: " << m_run_time / 1000 << "s";
+    TextImage* text_image = dynamic_cast<TextImage*>(objects[2]);
+    text_image->set_text(delta_text.str());
     
     Object2D* object_ptr = objects[0];
     Vector2<int> direction = input.get_vector("right", "left", "down", "up");

@@ -28,9 +28,11 @@ private:
     void load_text_texture(SDL_Renderer* target_renderer, TTF_Font* font_ptr);
 
 private:
-    std::string text;
-    Vector3<uint8_t> color;
-    uint8_t alpha;
+    std::string m_text;
+    bool m_text_updated{false};
+
+    Vector3<uint8_t> m_color;
+    uint8_t m_alpha;
 
 };
 

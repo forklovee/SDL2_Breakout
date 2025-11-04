@@ -45,6 +45,8 @@ private:
     int m_window_height;
     int m_window_width;
 
+    Uint32 m_run_time;
+
     std::vector<TTF_Font*> fonts;
     std::vector<Object2D*> objects;
 
