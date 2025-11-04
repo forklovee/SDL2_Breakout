@@ -66,9 +66,13 @@ void Game::start()
     input.bind_action("left", SDLK_a);
     input.bind_action("right", SDLK_d);
 
-    Engine::default_font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 9);
+    Engine::default_font = TTF_OpenFont("../assets/fonts/Proto/0xProtoNerdFontPropo-Regular.ttf", 9);
+    if (default_font == NULL){
+        std::cerr << "Default font not loaded :(" << std::endl;
+    }
 
-    TTF_Font* font = TTF_OpenFont("../assets/fonts/Orbitron/Orbitron-Regular.ttf", 28);
+
+    TTF_Font* font = TTF_OpenFont("../assets/fonts/Proto/0xProtoNerdFontPropo-Regular.ttf", 28);
     if (font == NULL){
         std::cerr << "Font not loaded :(" << std::endl;
     }
