@@ -16,7 +16,6 @@
 #include <SDL_stdinc.h>
 #include <SDL_timer.h>
 #include <SDL_ttf.h>
-#include <iomanip>
 #include <iostream>
 #include <ostream>
 #include <sstream>
@@ -29,10 +28,12 @@ TTF_Font* default_font = nullptr;
 
 Game::Game(const char* title, int window_height, int window_width)
     :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
-    m_window_height(window_height), m_window_width(window_width)
+    m_window_height(window_height), m_window_width(window_width),
+    m_timer(Timer())
 {
     if (init(title)){
         m_is_running = true;
+        m_timer.start();
     }
     else{
         std::string input_wait_line_dummy;
@@ -83,7 +84,7 @@ void Game::start()
     fonts.push_back(font);
 
 
-    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], {}, Vector2<int>{380, 30}, Vector3<uint8_t>{0}, 255);
+    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], {}, Vector2<int>{100, 20}, Vector3<uint8_t>{0}, 255);
     Image* image = new Image(m_renderer, "../assets/images/preview.png", {100}, {200, 150});
     AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", {200, 400}, {64, 205}, 4);
 
@@ -109,12 +110,9 @@ void Game::process_input()
 void Game::update()
 {
     // game logic
-    Uint32 last_run_time = m_run_time;
-    m_run_time = SDL_GetTicks();
-    Uint32 delta_time = m_run_time - last_run_time;
 
     std::stringstream delta_text{""};
-    delta_text << "FPS: " << std::setw(8) << 1000.f/delta_time << "  |  Run time: " << m_run_time / 1000 << "s";
+    delta_text << "Run time: " << m_timer.get_ticks_sec() << "s";
     TextImage* text_image = dynamic_cast<TextImage*>(objects[2]);
     text_image->set_text(delta_text.str());
     

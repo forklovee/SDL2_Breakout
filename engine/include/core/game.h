@@ -1,12 +1,12 @@
 #pragma once
 
+#include "core/timing.h"
 #include "graphics/object2d.h"
 #include "math/vector.h"
 
 #include "SDL2/SDL_surface.h"
 #include "SDL_render.h"
 #include <SDL_ttf.h>
-#include <memory>
 #include <vector>
 
 namespace Engine{
@@ -45,7 +45,7 @@ private:
     int m_window_height;
     int m_window_width;
 
-    Uint32 m_run_time;
+    Timer m_timer;
 
     std::vector<TTF_Font*> fonts;
     std::vector<Object2D*> objects;

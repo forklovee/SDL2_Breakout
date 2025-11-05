@@ -4,7 +4,7 @@ add_library(engine STATIC)
 
 target_sources(engine PRIVATE
     src/core/game.cpp
-
+    src/core/timing.cpp
     src/core/input.cpp
 
     src/graphics/object2d.cpp
