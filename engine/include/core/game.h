@@ -61,6 +61,8 @@ private:
     Timer m_timer;
     uint32_t m_counted_frames;
 
+    Timer m_step_timer;
+
     bool m_fps_cap_enabled;
     Timer m_cap_timer;
     uint16_t m_fps_cap;

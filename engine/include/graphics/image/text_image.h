@@ -13,7 +13,7 @@ class TextImage: public Image
 {
 public:
     TextImage();
-    TextImage(SDL_Renderer* target_renderer, std::string text, TTF_Font* font_ptr,
+    TextImage(std::string text, TTF_Font* font_ptr,
         Vector2<int> position = {}, Vector2<int> size = {32}, 
         Vector3<uint8_t> color = {0}, uint8_t alpha = 255);
 

@@ -12,6 +12,8 @@ target_sources(engine PRIVATE
     src/graphics/image/animated_image.cpp
     src/graphics/image/text_image.cpp
     src/ui/button/button.cpp
+
+    src/entity/ball_entity.cpp
 )
 
 target_include_directories(engine

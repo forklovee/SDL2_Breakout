@@ -3,11 +3,9 @@
 
 namespace Engine {
 
-AnimatedImage::AnimatedImage(SDL_Renderer* target_renderer, const char* texture_path,
-    Vector2<int> position, Vector2<int> size,
+AnimatedImage::AnimatedImage(const char* texture_path, Vector2<int> position, Vector2<int> size,
     uint8_t frames, bool use_color_key, Vector3<uint8_t> color_key)
-    : Image(target_renderer, texture_path, position, size, use_color_key, color_key),
-        m_frames(frames)
+    : Image(texture_path, position, size, use_color_key, color_key), m_frames(frames)
 {
     std::cout << "AnimatedImage!" << get_size() << std::endl;
 

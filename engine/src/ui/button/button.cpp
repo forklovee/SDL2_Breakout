@@ -10,14 +10,14 @@
 
 namespace Engine {
 
-Button::Button(SDL_Renderer* renderer, std::string text, bool is_togglable,
+Button::Button(std::string text, bool is_togglable,
   Vector2<int> position, Vector2<int> size, TTF_Font* font)
     : Object2D(position, size), m_text(text), m_is_pressed(false), m_is_toggleable(is_togglable),
       m_default_color(200), m_default_alpha(255),
       m_hover_color(235), m_hover_alpha(255),
       m_pressed_color(175), m_pressed_alpha(255),
-      m_button_text_image(renderer, text, font, position, size),
-      m_background_image(renderer, "", position, size)
+      m_button_text_image(text, font, position, size),
+      m_background_image( "", position, size)
 {
   set_process_events(true);
   m_background_image.set_color({200, 0, 0}, 255);

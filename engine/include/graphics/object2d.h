@@ -18,10 +18,11 @@ public:
 
 
     Object2D() = default;
-    Object2D(Vector2<int> position, Vector2<int> size);
+    Object2D(Vector2<int> position = {}, Vector2<int> size = {64});
     virtual ~Object2D();
 
     virtual void render(SDL_Renderer* renderer);
+    virtual void process(float delta_time);
     virtual void handle_event(const SDL_Event& event);
 
     SDL_Rect get_transform() const;

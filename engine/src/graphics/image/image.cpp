@@ -6,25 +6,21 @@
 #include "SDL_rect.h"
 #include "SDL_render.h"
 #include "SDL_surface.h"
+#include <cstdint>
 #include <iostream>
 
 namespace Engine {
 
 Image::Image(Vector2<int> position, Vector2<int> size)
-    :Object2D(position, size), m_image_texture(nullptr, nullptr)
+    :Object2D(position, size), m_image_texture(nullptr, nullptr), m_loaded(false)
 {
 }
 
 
-Image::Image(SDL_Renderer* target_renderer, const char* texture_path, Vector2<int> position, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
-    :Object2D(position, size), m_image_texture(nullptr, nullptr)
+Image::Image(const char* texture_path, Vector2<int> position, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
+    :Object2D(position, size), m_image_texture(nullptr, nullptr), m_use_color_key(use_color_key), m_color_key(color_key), m_loaded(false)
 {
-    if (use_color_key){
-        load_texture(texture_path, target_renderer, color_key);
-    }
-    else{
-        load_texture(texture_path, target_renderer);
-    }
+    set_texture_path(texture_path);
 }
 
 Image::~Image()
@@ -34,6 +30,10 @@ Image::~Image()
 
 void Image::render(SDL_Renderer* renderer)
 {
+    if (!is_texture_loaded()){
+        load_texture(renderer);
+    }
+
     if (m_image_clips.empty()){
         draw(renderer);
         return;
@@ -59,6 +59,14 @@ void Image::set_blend_mode(SDL_BlendMode blend_mode)
 
 SDL_Texture* Image::get_texture() const{
     return m_image_texture.get();
+}
+
+void Image::set_texture_path(const char* texture_path){
+    if (is_texture_loaded()){ // Free current texture
+        m_image_texture.reset();
+    }
+    m_loaded = false;
+    m_texture_path = texture_path;
 }
 
 void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position){
@@ -90,6 +98,9 @@ void Image::draw(SDL_Renderer* renderer, SDL_Rect* clip_rect)
         return;
     }
 
+    SDL_SetTextureColorMod(m_image_texture.get(), m_color.x, m_color.y, m_color.z);
+    SDL_SetTextureAlphaMod(m_image_texture.get(), m_alpha);
+    
     SDL_RenderCopyEx(renderer, m_image_texture.get(), clip_rect, &transform,
         get_rotation(), &get_pivot_point(), get_flipmode());
 }
@@ -113,61 +124,58 @@ void Image::draw_image_clip(SDL_Renderer* renderer, uint8_t image_clip_id)
     draw_image_clip(renderer, m_image_clips[image_clip_id]);
 }
 
-bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer)
-{
-    std::cout << "Image: Load texture from path: " << texture_path << "." << std::endl;
+const bool Image::is_texture_loaded() const{
+    return m_image_texture != NULL;
+}
 
-    if (m_image_texture){
-        m_image_texture.reset();
+
+bool Image::load_texture(SDL_Renderer* target_renderer)
+{
+    // If renderer is not provided, do not load the texture
+    if (target_renderer == NULL){
+        return false;
+    }
+    if (m_loaded){
+        return true;
     }
 
-    if (texture_path != NULL && texture_path[0] == '\0'){
+    m_loaded = true;
+
+    if (m_texture_path.empty()){
         return false;
     }
 
-    SDL_Texture* raw_texture = IMG_LoadTexture(target_renderer, texture_path);
-    m_image_texture = SDLTexturePtr(raw_texture, SDL_DestroyTexture);
+    std::cout << "Image: Load texture from path: " << m_texture_path << "." << std::endl;
+
+    // Load Texture
+
+    if (!m_use_color_key){
+        SDL_Texture* raw_texture_ptr = IMG_LoadTexture(target_renderer, m_texture_path.c_str());
+        m_image_texture = SDLTexturePtr(raw_texture_ptr, SDL_DestroyTexture);
+    }
+    else{
+        SDL_Surface* image_surface = IMG_Load(m_texture_path.c_str());
+        if (!image_surface){
+            std::cerr << "Error! Couldn't create an image surface from " << m_texture_path << " image!" << IMG_GetError() << std::endl;
+            return false;
+        }
+
+        SDL_SetColorKey(image_surface, SDL_TRUE, 
+            SDL_MapRGB(image_surface->format, m_color_key.x, m_color_key.y, m_color_key.z));
+        
+        
+        SDL_Texture* raw_texture_ptr = SDL_CreateTextureFromSurface(target_renderer, image_surface);
+        SDL_FreeSurface(image_surface);
+
+        m_image_texture = SDLTexturePtr(raw_texture_ptr, SDL_DestroyTexture);
+    }
    
     if (!m_image_texture){
-        std::cerr << "Error! Couldn't create a texture from "<< texture_path << " image! " << SDL_GetError() << std::endl;
+        std::cerr << "Error! Couldn't create a texture from "<< m_texture_path << " image! " << SDL_GetError() << std::endl;
         return false;
     }
     
     return m_image_texture != NULL;
-}
-
-bool Image::load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t>& color_key)
-{
-    std::cout << "Image: Load texture from path: " << texture_path << "." << std::endl;
-
-    if (m_image_texture){
-        m_image_texture.reset();
-    }
-
-    if (texture_path != NULL && texture_path[0] == '\0'){
-        return false;
-    }
-
-
-    SDL_Surface* image_surface = IMG_Load(texture_path);
-    if (!image_surface){
-        std::cerr << "Error! Couldn't create an image surface from " << texture_path << " image!" << IMG_GetError() << std::endl;
-        return false;
-    }
-
-    SDL_SetColorKey(image_surface, SDL_TRUE, 
-        SDL_MapRGB(image_surface->format, color_key.x, color_key.y, color_key.z));
-    
-    
-    SDL_Texture* raw_texture_ptr = SDL_CreateTextureFromSurface(target_renderer, image_surface);
-    m_image_texture = SDLTexturePtr(raw_texture_ptr, SDL_DestroyTexture);
-
-    if (!m_image_texture){
-        std::cerr << "Error! Couldn't create a texture from "<< texture_path << " image!" << SDL_GetError() << std::endl;
-        return false;
-    }
-    SDL_FreeSurface(image_surface);
-    return m_image_texture != nullptr;
 }
 
 void Image::clear()

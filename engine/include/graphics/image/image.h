@@ -38,8 +38,7 @@ class Image: public Object2D{
 public:
     Image();
     Image(Vector2<int> position, Vector2<int> size);
-    Image(SDL_Renderer* target_renderer, const char* texture_path,
-        Vector2<int> position, Vector2<int> size, 
+    Image(const char* texture_path, Vector2<int> position, Vector2<int> size,
         bool use_color_key = false, Vector3<uint8_t> color_key = {});
     
     virtual ~Image();
@@ -50,6 +49,7 @@ public:
     void set_blend_mode(SDL_BlendMode blend_mode);
 
     SDL_Texture* get_texture() const;
+    void set_texture_path(const char* texture_path);
 
     void add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position = {});
     void remove_image_clip(const size_t clip_id);
@@ -64,16 +64,23 @@ protected:
     void draw_image_clip(SDL_Renderer*, uint8_t image_clip_id);
 
 private:
-    bool load_texture(const char* texture_path, SDL_Renderer* target_renderer);
-    bool load_texture(const char* texture_path, SDL_Renderer* target_renderer, Vector3<uint8_t>& color_key);
+    const bool is_texture_loaded() const;
+    bool load_texture(SDL_Renderer* target_renderer);
+
     void clear();
 
 protected:
+    std::string m_texture_path;
     SDLTexturePtr m_image_texture = {nullptr, nullptr};
     std::vector<ImageClip> m_image_clips;
 
-    Vector3<uint8_t> m_color{255, 255, 255};
+    Vector3<uint8_t> m_color{255};
     uint8_t m_alpha{255};
+
+    bool m_use_color_key;
+    Vector3<uint8_t> m_color_key;
+
+    bool m_loaded;
 
 };
 

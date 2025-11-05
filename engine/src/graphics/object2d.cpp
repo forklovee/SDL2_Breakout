@@ -21,6 +21,10 @@ void Object2D::render(SDL_Renderer* renderer)
 
 }
 
+void Object2D::process(float delta_time)
+{
+    
+}
 
 void Object2D::handle_event(const SDL_Event& event)
 {

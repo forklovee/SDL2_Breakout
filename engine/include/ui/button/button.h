@@ -15,8 +15,8 @@ class Button: public Object2D
 {
 public:
     Button() = default;
-    Button(SDL_Renderer* renderer, std::string text, bool is_togglable = false,
-        Vector2<int> position = {}, Vector2<int> size = {64}, 
+    Button(std::string text, bool is_togglable = false,
+        Vector2<int> position = {}, Vector2<int> size = {64},
         TTF_Font* font = Engine::default_font);
     
     virtual ~Button() override;

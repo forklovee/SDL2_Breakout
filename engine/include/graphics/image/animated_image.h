@@ -8,8 +8,7 @@ class AnimatedImage : public Image
 {
 public:
     AnimatedImage() = default;
-    AnimatedImage(SDL_Renderer* target_renderer, const char* texture_path,
-        Vector2<int> position, Vector2<int> size, 
+    AnimatedImage(const char* texture_path, Vector2<int> position, Vector2<int> size,
         uint8_t frames, bool use_color_key = false, Vector3<uint8_t> color_key = {});
     ~AnimatedImage() = default;
 

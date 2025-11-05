@@ -1,8 +1,10 @@
 #include "core/game.h"
 
 #include "core/input.h"
+#include "entity/ball_entity.h"
 #include "graphics/image/image.h"
 #include "graphics/image/text_image.h"
+#include "graphics/object2d.h"
 #include "math/vector.h"
 #include "graphics/image/animated_image.h"
 
@@ -16,6 +18,8 @@
 #include <SDL_stdinc.h>
 #include <SDL_timer.h>
 #include <SDL_ttf.h>
+#include <cstdint>
+#include <filesystem>
 #include <iostream>
 #include <ostream>
 #include <sstream>
@@ -60,6 +64,8 @@ void Game::run()
         update();
         render();
 
+        m_step_timer.start();
+
         if (const int frame_ticks = m_cap_timer.get_ticks(); m_fps_cap_enabled){
             // frame finished early, wait!
             if (frame_ticks < get_screen_ticks_per_frame()){
@@ -99,34 +105,38 @@ const int Game::get_screen_ticks_per_frame() {
 
 void Game::start()
 {
+    std::cout << "Game started in directory: " << std::filesystem::current_path() << "\n";
+
     input.bind_action("up", SDLK_w);    
     input.bind_action("down", SDLK_s);
     input.bind_action("left", SDLK_a);
     input.bind_action("right", SDLK_d);
 
-    Engine::default_font = TTF_OpenFont("../assets/fonts/Proto/0xProtoNerdFontPropo-Regular.ttf", 9);
+    Engine::default_font = TTF_OpenFont("assets/fonts/Proto/0xProtoNerdFontPropo-Regular.ttf", 9);
     if (default_font == NULL){
-        std::cerr << "Default font not loaded :(" << std::endl;
+        std::cerr << "Default font not loaded: " << TTF_GetError() << std::endl;
     }
 
-
-    TTF_Font* font = TTF_OpenFont("../assets/fonts/Proto/0xProtoNerdFontPropo-Regular.ttf", 28);
+    TTF_Font* font = TTF_OpenFont("assets/fonts/Proto/0xProtoNerdFontPropo-Regular.ttf", 28);
     if (font == NULL){
-        std::cerr << "Font not loaded :(" << std::endl;
+        std::cerr << "Font not loaded: " << TTF_GetError() << std::endl;
     }
     fonts.push_back(font);
 
 
-    TextImage* text_image = new TextImage(m_renderer, "Hello, world!", fonts[0], {}, Vector2<int>{100, 20}, Vector3<uint8_t>{0}, 255);
-    Image* image = new Image(m_renderer, "../assets/images/preview.png", {100}, {200, 150});
-    AnimatedImage* animated_image = new AnimatedImage(m_renderer, "../assets/images/foo.png", {200, 400}, {64, 205}, 4);
+    TextImage* text_image = new TextImage("Hello, world!", fonts[0], {}, Vector2<int>{100, 20}, Vector3<uint8_t>{0}, 255);
+    Image* image = new Image("assets/images/preview.png", {100}, {200, 150});
+    AnimatedImage* animated_image = new AnimatedImage("assets/images/foo.png", {200, 400}, {64, 205}, 4);
 
     objects.push_back(animated_image);
     objects.push_back(image);
     objects.push_back(text_image);
 
-    Button* button = new Button(m_renderer, "Button!", true, {200, 64});
+    Button* button = new Button("Button!", true, {200, 64});
     objects.push_back(button);
+
+    Breakout::BallEntity* ball = new Breakout::BallEntity({100, 400}, {64});
+    objects.push_back(ball);
 
 }
 
@@ -143,7 +153,6 @@ void Game::process_input()
 void Game::update()
 {
     // game logic
-
     float avg_fps = m_counted_frames / m_timer.get_ticks_sec();
     if (avg_fps > 2000000){
         avg_fps = 0;
@@ -160,10 +169,14 @@ void Game::update()
         object_ptr->set_position(object_ptr->get_position() + direction);
     }
 
+    float delta_time = m_step_timer.get_ticks_sec();
+    for(Object2D* object: objects){
+        object->process(delta_time);
+    }
+
     // if (!images.empty()){
     //     images[0]->set_size(get_screen_surface_size());
     // }
-
 
 }
 
