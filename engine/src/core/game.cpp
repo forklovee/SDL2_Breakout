@@ -29,7 +29,8 @@ TTF_Font* default_font = nullptr;
 Game::Game(const char* title, int window_height, int window_width)
     :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
     m_window_height(window_height), m_window_width(window_width),
-    m_timer(Timer()), m_counted_frames(0)
+    m_timer(Timer()), m_counted_frames(0), 
+    m_cap_timer(Timer()), m_fps_cap_enabled(true), m_fps_cap(60)
 {
     if (init(title)){
         m_is_running = true;
@@ -53,15 +54,47 @@ void Game::run()
     start();
 
     while(m_is_running){
+        m_cap_timer.start();
+
         process_input();
         update();
         render();
+
+        if (const int frame_ticks = m_cap_timer.get_ticks(); m_fps_cap_enabled){
+            // frame finished early, wait!
+            if (frame_ticks < get_screen_ticks_per_frame()){
+                SDL_Delay(get_screen_ticks_per_frame() - frame_ticks);
+            }
+        }
     }
 }
 
 Vector2<int> Game::get_screen_surface_size() const
 {
     return {m_window_width, m_window_height};
+}
+
+void Game::set_fps_cap_enabled(bool state){
+    m_fps_cap_enabled = state;
+    if (!m_fps_cap_enabled) {
+        m_cap_timer.stop();
+    }
+}
+
+const bool& Game::get_fps_cap_enabled() const{
+    return m_fps_cap_enabled;
+}
+
+void Game::set_fps_cap(uint16_t fps_cap){
+    m_fps_cap = fps_cap;
+}
+
+const uint16_t& Game::get_fps_cap() const{
+    return m_fps_cap;
+}
+
+const int Game::get_screen_ticks_per_frame() {
+    return 1000 / get_fps_cap();
 }
 
 void Game::start()
@@ -172,7 +205,7 @@ bool Game::init(const char* title)
     }
 
     m_renderer = SDL_CreateRenderer(m_window, -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        SDL_RENDERER_ACCELERATED);
     if (m_renderer == NULL){
         std::cerr << "Renderer couldn't be created! SDL_Error:" << SDL_GetError() << std::endl;
         return false;

@@ -25,7 +25,18 @@ public:
     ~Game();
 
     void run();
+
     Vector2<int> get_screen_surface_size() const; 
+
+#pragma region FPS
+
+    void set_fps_cap_enabled(bool state);
+    const bool& get_fps_cap_enabled() const;
+    
+    void set_fps_cap(uint16_t fps_cap);
+    const uint16_t& get_fps_cap() const;
+
+#pragma endregion FPS
 
 private:
     void start();
@@ -37,6 +48,8 @@ private:
     bool init(const char* title);
     void clear();
 
+    const int get_screen_ticks_per_frame();
+
 private:
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;
@@ -47,6 +60,10 @@ private:
 
     Timer m_timer;
     uint32_t m_counted_frames;
+
+    bool m_fps_cap_enabled;
+    Timer m_cap_timer;
+    uint16_t m_fps_cap;
 
     std::vector<TTF_Font*> fonts;
     std::vector<Object2D*> objects;
