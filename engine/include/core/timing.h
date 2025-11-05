@@ -14,7 +14,7 @@ public:
     void unpause();
 
     const Uint32 get_ticks();
-    const Uint32 get_ticks_sec();
+    const float get_ticks_sec();
 
     const bool& is_started() const;
     const bool is_paused() const;

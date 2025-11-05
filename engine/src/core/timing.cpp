@@ -50,8 +50,8 @@ const Uint32 Timer::get_ticks(){
     return 0;
 }
 
-const Uint32 Timer::get_ticks_sec(){
-    return get_ticks() / 1000;
+const float Timer::get_ticks_sec(){
+    return get_ticks() / 1000.f;
 }
 
 const bool& Timer::is_started() const{

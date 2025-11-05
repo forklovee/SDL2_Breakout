@@ -46,6 +46,7 @@ private:
     int m_window_width;
 
     Timer m_timer;
+    uint32_t m_counted_frames;
 
     std::vector<TTF_Font*> fonts;
     std::vector<Object2D*> objects;

@@ -29,7 +29,7 @@ TTF_Font* default_font = nullptr;
 Game::Game(const char* title, int window_height, int window_width)
     :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
     m_window_height(window_height), m_window_width(window_width),
-    m_timer(Timer())
+    m_timer(Timer()), m_counted_frames(0)
 {
     if (init(title)){
         m_is_running = true;
@@ -111,8 +111,13 @@ void Game::update()
 {
     // game logic
 
+    float avg_fps = m_counted_frames / m_timer.get_ticks_sec();
+    if (avg_fps > 2000000){
+        avg_fps = 0;
+    }
+
     std::stringstream delta_text{""};
-    delta_text << "Run time: " << m_timer.get_ticks_sec() << "s";
+    delta_text << "Avg FPS: " << avg_fps;
     TextImage* text_image = dynamic_cast<TextImage*>(objects[2]);
     text_image->set_text(delta_text.str());
     
@@ -139,6 +144,7 @@ void Game::render()
     }
 
     SDL_RenderPresent(m_renderer);
+    ++m_counted_frames;
 }
 
 bool Game::init(const char* title)
