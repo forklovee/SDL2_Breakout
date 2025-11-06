@@ -17,7 +17,7 @@ public:
     virtual void set_position(const Vector2<float>& position) override;
 
 private:
-    Vector2<int> m_velocity;
+    Vector2<float> m_velocity;
 
     Engine::Image m_ball_sprite;
 };

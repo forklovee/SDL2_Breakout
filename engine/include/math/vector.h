@@ -18,6 +18,12 @@ struct Vector2 {
         return static_cast<int>(x) == 0 && static_cast<int>(y) == 0;
     }
 
+    template<typename U, typename = typename std::enable_if<std::is_arithmetic<U>::value>::type>
+    explicit constexpr Vector2(const Vector2<U>& other_vec)
+        : x(static_cast<T>(other_vec.x)), y(static_cast<T>(other_vec.y)) 
+        {}
+
+
     Vector2 operator+(const Vector2& other_vec) const {
         return {x + other_vec.x, y + other_vec.y};
     }
@@ -100,6 +106,12 @@ struct Vector3 {
     Vector3() = default;
     Vector3(T x, T y, T z) : x(x), y(y), z(z) {};
     Vector3(T xyz) : x(xyz), y(xyz), z(xyz) {};
+
+    template<typename U, typename std::enable_if<std::is_arithmetic<U>::value>::type>
+    explicit constexpr Vector3(const Vector3<U>& other_vec)
+        : x(static_cast<T>(other_vec.x)), y(static_cast<T>(other_vec.y)), z(static_cast<T>(other_vec.z))
+        {}
+
 
     Vector3 operator+(const Vector3& other_vec) const {
         return {x + other_vec.x, y + other_vec.y, z + other_vec.z};
