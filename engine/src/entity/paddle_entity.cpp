@@ -1,0 +1,47 @@
+#include "entity/paddle_entity.h"
+
+#include "graphics/image/image.h"
+#include "core/input.h"
+
+#include <cmath>
+
+namespace Breakout{
+
+Paddle::Paddle(Vector2<float> position, Vector2<int> size)
+    : Engine::Object2D(position - size.x*.5, size), 
+    m_input_direction(0), m_velocity(0), m_center_pos_x(m_position.x),
+    m_paddle_image("assets/images/Paddle.png", m_position, m_size)
+    {}
+
+
+void Paddle::render(SDL_Renderer* renderer){
+    m_paddle_image.render(renderer);
+}
+
+
+void Paddle::process(float delta_time){
+    m_velocity = m_input_direction * 100.f * delta_time;
+
+    const Vector2<float> current_position = get_position();
+    const Vector2<float> target_position = get_position() + Vector2<float>{m_velocity, 0.f};
+
+    if (abs(target_position.x - m_center_pos_x) > 130){
+        return;
+    }
+    set_position(target_position);
+}
+
+void Paddle::handle_event(const SDL_Event& event){
+    Engine::InputManager& input = Engine::InputManager::get_instance();
+
+    m_input_direction = input.get_axis("right", "left");
+}
+
+void Paddle::set_position(const Vector2<float>& position){
+    Engine::Object2D::set_position(position);
+
+    m_paddle_image.set_position(position);
+}
+
+
+}

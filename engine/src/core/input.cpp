@@ -107,11 +107,16 @@ Vector2<int32_t>& InputManager::get_mouse_position(){
   return m_mouse_position;
 }
 
+const int InputManager::get_axis(const std::string& pos_axis, const std::string& neg_axis){
+  return is_action_pressed(pos_axis) - is_action_pressed(neg_axis);
+}
+
+
 const Vector2<int> InputManager::get_vector(const std::string& x_axis_pos_action, const std::string& x_axis_neg_action,
     const std::string& y_axis_pos_action, const std::string& y_axis_neg_action){
   return {
-    is_action_pressed(x_axis_pos_action) - is_action_pressed(x_axis_neg_action),
-    is_action_pressed(y_axis_pos_action) - is_action_pressed(y_axis_neg_action),
+    get_axis(x_axis_pos_action, x_axis_neg_action),
+    get_axis(y_axis_pos_action, y_axis_neg_action),
   };
 }
 

@@ -9,7 +9,7 @@
 namespace Breakout {
 
 BallEntity::BallEntity(Vector2<float> position, Vector2<int> size)
-    : Engine::Object2D(position, size), m_velocity({0.0}),
+    : Engine::Object2D(position, size), m_velocity({1.0}),
     m_ball_sprite("assets/images/Ball.png", position, size)
 {
     m_ball_sprite.set_color({255, 0, 0}, 255);

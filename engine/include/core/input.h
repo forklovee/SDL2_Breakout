@@ -36,6 +36,8 @@ public:
   bool is_mouse_button_released(bool secondary = false);
   bool is_mouse_button_just_released(bool secondary = false);
 
+  const int get_axis(const std::string& pos_axis, const std::string& neg_axis);
+
   const Vector2<int> get_vector(const std::string& x_axis_pos_action, const std::string& x_axis_neg_action,
     const std::string& y_axis_pos_action, const std::string& y_axis_neg_action);
 

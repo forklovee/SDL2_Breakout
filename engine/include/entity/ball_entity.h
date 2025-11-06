@@ -9,7 +9,7 @@ namespace Breakout{
 
 class BallEntity: public Engine::Object2D{
 public:
-    BallEntity(Vector2<float> position, Vector2<int> size);
+    BallEntity(Vector2<float> position = {}, Vector2<int> size = {28});
 
     virtual void render(SDL_Renderer* renderer) override;
     virtual void process(float delta_time) override;

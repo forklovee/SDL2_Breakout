@@ -2,6 +2,7 @@
 
 #include "core/input.h"
 #include "entity/ball_entity.h"
+#include "entity/paddle_entity.h"
 #include "graphics/image/image.h"
 #include "graphics/image/text_image.h"
 #include "graphics/object2d.h"
@@ -135,8 +136,13 @@ void Game::start()
     Button* button = new Button("Button!", true, {200, 64});
     objects.push_back(button);
 
-    Breakout::BallEntity* ball = new Breakout::BallEntity({100, 400}, {64});
-    objects.push_back(ball);
+    objects.push_back(
+        new Breakout::BallEntity(Vector2<float>{100, 400})
+    );
+
+    objects.push_back(
+        new Breakout::Paddle(Vector2<float>{m_window_width/2, m_window_height - 50})
+    );
 
 }
 
