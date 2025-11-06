@@ -23,11 +23,11 @@ struct ImageClip{
     SDL_Rect destination_rect;
     SDL_Rect clip_rect;
 
-    ImageClip(SDL_Rect& clip_rect, Vector2<int> render_position){
+    ImageClip(SDL_Rect& clip_rect, Vector2<float> render_position){
         this->clip_rect = clip_rect;
         this->destination_rect = {
-            render_position.x,
-            render_position.y,
+            static_cast<int>(render_position.x),
+            static_cast<int>(render_position.y),
             clip_rect.w,
             clip_rect.h
         };
@@ -37,8 +37,8 @@ struct ImageClip{
 class Image: public Object2D{
 public:
     Image();
-    Image(Vector2<int> position, Vector2<int> size);
-    Image(const char* texture_path, Vector2<int> position, Vector2<int> size,
+    Image(Vector2<float> position, Vector2<int> size);
+    Image(const char* texture_path, Vector2<float> position, Vector2<int> size,
         bool use_color_key = false, Vector3<uint8_t> color_key = {});
     
     virtual ~Image();
@@ -51,10 +51,9 @@ public:
     SDL_Texture* get_texture() const;
     void set_texture_path(const char* texture_path);
 
-    void add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position = {});
+    void add_image_clip(SDL_Rect clip_rect, Vector2<float> local_position = {});
     void remove_image_clip(const size_t clip_id);
     ImageClip& get_imape_clip(const size_t clip_id);
-
 
 protected:
     virtual void draw(SDL_Renderer* renderer, SDL_Rect* clip_rect = nullptr);

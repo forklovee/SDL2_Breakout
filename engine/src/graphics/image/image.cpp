@@ -11,13 +11,13 @@
 
 namespace Engine {
 
-Image::Image(Vector2<int> position, Vector2<int> size)
+Image::Image(Vector2<float> position, Vector2<int> size)
     :Object2D(position, size), m_image_texture(nullptr, nullptr), m_loaded(false)
 {
 }
 
 
-Image::Image(const char* texture_path, Vector2<int> position, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
+Image::Image(const char* texture_path, Vector2<float> position, Vector2<int> size, bool use_color_key, Vector3<uint8_t> color_key)
     :Object2D(position, size), m_image_texture(nullptr, nullptr), m_use_color_key(use_color_key), m_color_key(color_key), m_loaded(false)
 {
     set_texture_path(texture_path);
@@ -69,7 +69,7 @@ void Image::set_texture_path(const char* texture_path){
     m_texture_path = texture_path;
 }
 
-void Image::add_image_clip(SDL_Rect clip_rect, Vector2<int> local_position){
+void Image::add_image_clip(SDL_Rect clip_rect, Vector2<float> local_position){
     m_image_clips.push_back(ImageClip(clip_rect, m_position + local_position));
 }
 

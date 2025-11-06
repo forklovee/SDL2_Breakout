@@ -12,7 +12,7 @@
 namespace Engine {
 
 TextImage::TextImage(std::string text, TTF_Font* font_ptr, 
-    Vector2<int> position, Vector2<int> size, Vector3<uint8_t> color, uint8_t alpha)
+    Vector2<float> position, Vector2<int> size, Vector3<uint8_t> color, uint8_t alpha)
 : Image(position, size), m_text(text), m_text_updated(false), m_color(color), m_alpha(alpha)
 {
     

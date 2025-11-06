@@ -22,16 +22,40 @@ struct Vector2 {
         return {x + other_vec.x, y + other_vec.y};
     }
 
+    Vector2 operator+=(const Vector2& other_vec) {
+        x += other_vec.x;
+        y += other_vec.y;
+        return *this;
+    }
+
     Vector2 operator-(const Vector2& other_vec) const {
         return {x - other_vec.x, y - other_vec.y};
+    }
+
+    Vector2 operator-=(const Vector2& other_vec) {
+        x -= other_vec.x;
+        y -= other_vec.y;
+        return *this;
     }
 
     Vector2 operator*(const float scale) const {
         return {x * scale, y * scale};
     }
 
+    Vector2 operator*=(const float& scale) {
+        x *= scale;
+        y *= scale;
+        return *this;
+    }
+
     Vector2 operator*(const Vector2& other_vec) const {
         return {x * other_vec.x, y * other_vec.y};
+    }
+
+    Vector2 operator*=(const Vector2& other_vec) {
+        x += other_vec.x;
+        y += other_vec.y;
+        return *this;
     }
 
     Vector2 operator/(const float scale) const {
@@ -41,11 +65,23 @@ struct Vector2 {
         return {x / scale, y / scale};
     }
 
+    Vector2 operator/=(const float scale) {
+        x /= scale;
+        y /= scale;
+        return *this;
+    }
+
     Vector2 operator/(const Vector2 other_vec) const {
         return {
             (other_vec.x == 0.f) ? x / other_vec.x : 0.f,
             (other_vec.y == 0.f) ? y / other_vec.y : 0.f
         };
+    }
+
+    Vector2 operator/=(const Vector2& other_vec) {
+        x /= other_vec.x;
+        y /= other_vec.y;
+        return *this;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vector2& v) {
@@ -69,16 +105,44 @@ struct Vector3 {
         return {x + other_vec.x, y + other_vec.y, z + other_vec.z};
     }
 
+    Vector3 operator+=(const Vector3& other_vec) {
+        x += other_vec.x;
+        y += other_vec.y;
+        z += other_vec.z;
+        return *this;
+    }
+
     Vector3 operator-(const Vector3& other_vec) const {
         return {x - other_vec.x, y - other_vec.y, z - other_vec.z};
+    }
+
+    Vector3 operator-=(const Vector3& other_vec) {
+        x -= other_vec.x;
+        y -= other_vec.y;
+        z -= other_vec.z;
+        return *this;
     }
 
     Vector3 operator*(const float scale) const {
         return {x * scale, y * scale, z * scale};
     }
 
+    Vector3 operator*=(const float& scale) {
+        x *= scale;
+        y *= scale;
+        z *= scale;
+        return *this;
+    }
+
     Vector3 operator*(const Vector3& other_vec) const {
         return {x * other_vec.x, y * other_vec.y, z * other_vec.z};
+    }
+
+    Vector3 operator*=(const Vector3& other_vec) {
+        x *= other_vec.x;
+        y *= other_vec.y;
+        z *= other_vec.z;
+        return *this;
     }
 
     Vector3 operator/(const float scale) const {
@@ -88,12 +152,26 @@ struct Vector3 {
         return {x / scale, y / scale, z / scale};
     }
 
+    Vector3 operator/=(const float scale) {
+        x /= scale;
+        y /= scale;
+        z /= scale;
+        return *this;
+    }
+
     Vector3 operator/(const Vector3 other_vec) const {
         return {
             (other_vec.x == 0.f) ? x / other_vec.x : 0.f,
             (other_vec.y == 0.f) ? y / other_vec.y : 0.f,
             (other_vec.z == 0.f) ? z / other_vec.z : 0.f
         };
+    }
+
+    Vector3 operator/=(const Vector3& other_vec) {
+        x /= other_vec.x;
+        y /= other_vec.y;
+        z /= other_vec.z;
+        return *this;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vector3& v) {

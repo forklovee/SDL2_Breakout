@@ -1,11 +1,12 @@
 #include "graphics/object2d.h"
+
 #include "core/input.h"
 #include <SDL_events.h>
 #include <iostream>
 
 namespace Engine{
 
-Object2D::Object2D(Vector2<int> position, Vector2<int> size) :
+Object2D::Object2D(Vector2<float> position, Vector2<int> size) :
     m_position(position), m_size(size), m_process_events{false}
 {
 
@@ -63,19 +64,19 @@ void Object2D::handle_event(const SDL_Event& event)
 SDL_Rect Object2D::get_transform() const
 {
     return {
-        m_position.x,
-        m_position.y,
+        static_cast<int>(m_position.x),
+        static_cast<int>(m_position.y),
         m_size.x,
         m_size.y
     };
 }
 
-const Vector2<int>& Object2D::get_position() const
+const Vector2<float>& Object2D::get_position() const
 {
     return m_position;
 }
 
-void Object2D::set_position(const Vector2<int>& position)
+void Object2D::set_position(const Vector2<float>& position)
 {
     m_position = position;
 }

@@ -162,12 +162,6 @@ void Game::update()
     delta_text << "Avg FPS: " << avg_fps;
     TextImage* text_image = dynamic_cast<TextImage*>(objects[2]);
     text_image->set_text(delta_text.str());
-    
-    Object2D* object_ptr = objects[0];
-    Vector2<int> direction = input.get_vector("right", "left", "down", "up");
-    if (object_ptr){
-        object_ptr->set_position(object_ptr->get_position() + direction);
-    }
 
     float delta_time = m_step_timer.get_ticks_sec();
     for(Object2D* object: objects){

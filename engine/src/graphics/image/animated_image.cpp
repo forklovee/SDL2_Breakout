@@ -3,7 +3,7 @@
 
 namespace Engine {
 
-AnimatedImage::AnimatedImage(const char* texture_path, Vector2<int> position, Vector2<int> size,
+AnimatedImage::AnimatedImage(const char* texture_path, Vector2<float> position, Vector2<int> size,
     uint8_t frames, bool use_color_key, Vector3<uint8_t> color_key)
     : Image(texture_path, position, size, use_color_key, color_key), m_frames(frames)
 {
@@ -54,13 +54,13 @@ void AnimatedImage::set_size(const Vector2<int> &size)
     }
 }
 
-void AnimatedImage::set_position(const Vector2<int>& position)
+void AnimatedImage::set_position(const Vector2<float>& position)
 {
     Image::set_position(position);
     for(ImageClip& image_clip_ptr : m_image_clips)
     {
-        image_clip_ptr.destination_rect.x = position.x;
-        image_clip_ptr.destination_rect.y = position.y;
+        image_clip_ptr.destination_rect.x = static_cast<int>(position.x);
+        image_clip_ptr.destination_rect.y = static_cast<int>(position.y);
     }
 }
 

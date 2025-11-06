@@ -11,7 +11,7 @@
 namespace Engine {
 
 Button::Button(std::string text, bool is_togglable,
-  Vector2<int> position, Vector2<int> size, TTF_Font* font)
+  Vector2<float> position, Vector2<int> size, TTF_Font* font)
     : Object2D(position, size), m_text(text), m_is_pressed(false), m_is_toggleable(is_togglable),
       m_default_color(200), m_default_alpha(255),
       m_hover_color(235), m_hover_alpha(255),
@@ -75,7 +75,7 @@ void Button::handle_event(const SDL_Event& event){
 }
 
 
-void Button::set_position(const Vector2<int>& position)
+void Button::set_position(const Vector2<float>& position)
 {
   // Object2D::set_position(position);
   m_background_image.set_position(position);

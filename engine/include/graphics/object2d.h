@@ -18,7 +18,7 @@ public:
 
 
     Object2D() = default;
-    Object2D(Vector2<int> position = {}, Vector2<int> size = {64});
+    Object2D(Vector2<float> position = {}, Vector2<int> size = {64});
     virtual ~Object2D();
 
     virtual void render(SDL_Renderer* renderer);
@@ -27,8 +27,8 @@ public:
 
     SDL_Rect get_transform() const;
 
-    const Vector2<int>& get_position() const;
-    virtual void set_position(const Vector2<int>& position);
+    const Vector2<float>& get_position() const;
+    virtual void set_position(const Vector2<float>& position);
 
     const Vector2<int>& get_size() const;
     virtual void set_size(const Vector2<int>& size);
@@ -46,7 +46,7 @@ public:
     virtual void set_process_events(const bool& process_events);
 
 protected:
-    Vector2<int> m_position{};
+    Vector2<float> m_position{};
     Vector2<int> m_size{};
 
     SDL_Point m_pivot_point{};

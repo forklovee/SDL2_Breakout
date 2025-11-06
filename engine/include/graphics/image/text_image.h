@@ -14,7 +14,7 @@ class TextImage: public Image
 public:
     TextImage();
     TextImage(std::string text, TTF_Font* font_ptr,
-        Vector2<int> position = {}, Vector2<int> size = {32}, 
+        Vector2<float> position = {}, Vector2<int> size = {32}, 
         Vector3<uint8_t> color = {0}, uint8_t alpha = 255);
 
     void set_text(const std::string& text);
