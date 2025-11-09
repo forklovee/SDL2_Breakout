@@ -2,6 +2,7 @@
 
 #include "graphics/object2d.h"
 #include "graphics/image/image.h"
+#include <SDL_rect.h>
 
 namespace Breakout{
 
@@ -9,7 +10,7 @@ class Paddle: public Engine::Object2D{
 public:
     Paddle(Vector2<float> position = {}, Vector2<int> size = {128, 32});
 
-    virtual void render(SDL_Renderer* renderer) override;
+    virtual void render(Engine::Window& target_window) override;
     virtual void process(float delta_time) override;
     virtual void handle_event(const SDL_Event& event) override;
 
@@ -23,6 +24,7 @@ private:
 
     Engine::Image m_paddle_image;
 
+    SDL_Rect m_collision_shape;
 
 };
 

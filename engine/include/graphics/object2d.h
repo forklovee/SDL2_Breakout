@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/window.h"
 #include "math/vector.h"
 #include <SDL_render.h>
 #include <SDL_events.h>
@@ -21,7 +22,7 @@ public:
     Object2D(Vector2<float> position = {}, Vector2<int> size = {64});
     virtual ~Object2D();
 
-    virtual void render(SDL_Renderer* renderer);
+    virtual void render(Window& target_window);
     virtual void process(float delta_time);
     virtual void handle_event(const SDL_Event& event);
 

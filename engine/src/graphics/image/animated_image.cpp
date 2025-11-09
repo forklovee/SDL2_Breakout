@@ -1,4 +1,5 @@
 #include "graphics/image/animated_image.h"
+#include "core/window.h"
 #include <iostream>
 
 namespace Engine {
@@ -17,9 +18,9 @@ AnimatedImage::AnimatedImage(const char* texture_path, Vector2<float> position, 
     }
 }
 
-void AnimatedImage::render(SDL_Renderer* renderer)
+void AnimatedImage::render(Window& target_window)
 {
-    Image::render(renderer);
+    Image::render(target_window);
 
     m_current_frame++;
     uint8_t animation_frame = m_current_frame / m_frames;
@@ -33,7 +34,7 @@ void AnimatedImage::render(SDL_Renderer* renderer)
     // std::cout << "AnimatedImage frame: " << image_clip.clip_rect.x << "," << image_clip.clip_rect.y <<
         // " " << image_clip.destination_rect.x << "," << image_clip.destination_rect.y << std::endl;
 
-    draw_image_clip(renderer, m_image_clips[animation_frame]);
+    draw_image_clip(target_window.get_renderer(), m_image_clips[animation_frame]);
 }
 
 void AnimatedImage::set_size(const Vector2<int> &size)

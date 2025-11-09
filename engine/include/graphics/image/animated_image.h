@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/window.h"
 #include "image.h"
 
 namespace Engine {
@@ -12,7 +13,7 @@ public:
         uint8_t frames, bool use_color_key = false, Vector3<uint8_t> color_key = {});
     ~AnimatedImage() = default;
 
-    void render(SDL_Renderer* renderer) override;
+    void render(Window& target_window) override;
 
     void set_position(const Vector2<float>& position) override;
     void set_size(const Vector2<int>& size) override;

@@ -10,12 +10,15 @@ namespace Breakout{
 Paddle::Paddle(Vector2<float> position, Vector2<int> size)
     : Engine::Object2D(position - size.x*.5, size), 
     m_input_direction(0), m_velocity(0), m_center_pos_x(m_position.x),
-    m_paddle_image("assets/images/Paddle.png", m_position, m_size)
-    {}
+    m_paddle_image("assets/images/Paddle.png", m_position, m_size),
+    m_collision_shape({0, 0, size.x, size.y})
+{
+    m_paddle_image.set_color({128, 128, 0}, 255);
+}
 
 
-void Paddle::render(SDL_Renderer* renderer){
-    m_paddle_image.render(renderer);
+void Paddle::render(Engine::Window& target_window){
+    m_paddle_image.render(target_window);
 }
 
 
@@ -41,6 +44,8 @@ void Paddle::set_position(const Vector2<float>& position){
     Engine::Object2D::set_position(position);
 
     m_paddle_image.set_position(position);
+    m_collision_shape.x = position.x;    
+    m_collision_shape.y = position.y;
 }
 
 

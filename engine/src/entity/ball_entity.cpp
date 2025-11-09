@@ -16,8 +16,8 @@ BallEntity::BallEntity(Vector2<float> position, Vector2<int> size)
 }
 
 
-void BallEntity::render(SDL_Renderer* renderer){
-    m_ball_sprite.render(renderer);
+void BallEntity::render(Engine::Window& target_window){
+    m_ball_sprite.render(target_window);
 }
 
 void BallEntity::process(float delta_time){

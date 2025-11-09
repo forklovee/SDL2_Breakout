@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/window.h"
 #include "graphics/object2d.h"
 
 #include "SDL2/SDL_rect.h"
@@ -43,7 +44,7 @@ public:
     
     virtual ~Image();
 
-    virtual void render(SDL_Renderer* renderer);
+    virtual void render(Window& target_window);
 
     void set_color(const Vector3<uint8_t>& color, const uint8_t& alpha);
     void set_blend_mode(SDL_BlendMode blend_mode);

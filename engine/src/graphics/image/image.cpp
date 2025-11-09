@@ -1,4 +1,5 @@
 #include "graphics/image/image.h"
+#include "core/window.h"
 #include "graphics/object2d.h"
 
 #include "SDL_error.h"
@@ -28,17 +29,17 @@ Image::~Image()
     clear();
 }
 
-void Image::render(SDL_Renderer* renderer)
+void Image::render(Window& target_window)
 {
     if (!is_texture_loaded()){
-        load_texture(renderer);
+        load_texture(target_window.get_renderer());
     }
 
     if (m_image_clips.empty()){
-        draw(renderer);
+        draw(target_window.get_renderer());
         return;
     }
-    draw_all_image_clips(renderer);
+    draw_all_image_clips(target_window.get_renderer());
 }
 
 void Image::set_color(const Vector3<uint8_t>& color, const uint8_t& alpha)

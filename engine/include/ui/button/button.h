@@ -21,7 +21,7 @@ public:
     
     virtual ~Button() override;
 
-    void render(SDL_Renderer* m_renderer) override;
+    void render(Window& target_window) override;
     void handle_event(const SDL_Event& event) override;
 
     void set_position(const Vector2<float>& position) override;

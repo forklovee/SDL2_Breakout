@@ -20,9 +20,8 @@ int main(int argc, char* argv[]){
         freopen_s(&fp, "CONIN$", "r", stdin);
     #endif
 
-    Engine::Game* game = new Engine::Game("Breakout", 600, 400);
-    game->run();
-    delete game;
+    Engine::Game game = Engine::Game("Breakout", 600, 400);
+    game.run();
 
     return 0;
 }

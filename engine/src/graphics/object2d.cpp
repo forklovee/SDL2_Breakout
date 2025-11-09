@@ -1,6 +1,7 @@
 #include "graphics/object2d.h"
 
 #include "core/input.h"
+#include "core/window.h"
 #include <SDL_events.h>
 #include <iostream>
 
@@ -17,7 +18,7 @@ Object2D::~Object2D()
 
 }
 
-void Object2D::render(SDL_Renderer* renderer)
+void Object2D::render(Window& target_window)
 {
 
 }

@@ -1,6 +1,7 @@
 #include "core/game.h"
 
 #include "core/input.h"
+#include "core/window.h"
 #include "entity/ball_entity.h"
 #include "entity/paddle_entity.h"
 #include "graphics/image/image.h"
@@ -12,19 +13,20 @@
 #include "SDL_error.h"
 #include "SDL_events.h"
 #include "SDL_image.h"
-#include "SDL_render.h"
-#include "SDL_video.h"
 #include "ui/button/button.h"
 #include <SDL_keycode.h>
 #include <SDL_stdinc.h>
-#include <SDL_timer.h>
 #include <SDL_ttf.h>
+#include <algorithm>
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace Engine {
 
@@ -32,12 +34,11 @@ InputManager& input = InputManager::get_instance();
 TTF_Font* default_font = nullptr;
 
 Game::Game(const char* title, int window_height, int window_width)
-    :m_window(nullptr), m_screen_surface(nullptr), m_is_running(false),
-    m_window_height(window_height), m_window_width(window_width),
+    :m_is_running(false),
     m_timer(Timer()), m_counted_frames(0), 
     m_cap_timer(Timer()), m_fps_cap_enabled(true), m_fps_cap(60)
 {
-    if (init(title)){
+    if (init(title, {window_width, window_height})){
         m_is_running = true;
         m_timer.start();
     }
@@ -54,8 +55,6 @@ Game::~Game()
 
 void Game::run()
 {
-    std::cout << "Game started in " << get_screen_surface_size() << " window." << std::endl;
-
     start();
 
     while(m_is_running){
@@ -76,9 +75,9 @@ void Game::run()
     }
 }
 
-Vector2<int> Game::get_screen_surface_size() const
-{
-    return {m_window_width, m_window_height};
+const Window& Game::create_window(std::string name, Vector2<int> size, Vector2<int> position){
+    Window* new_window = new Window(name, size, position);
+    return *new_window;
 }
 
 void Game::set_fps_cap_enabled(bool state){
@@ -104,6 +103,60 @@ const int Game::get_screen_ticks_per_frame() {
     return 1000 / get_fps_cap();
 }
 
+
+void Game::register_object(std::string object_name, Object2D* object_2d_ptr){
+    
+    for(std::string new_object_name = object_name; m_objects.find(object_name) != m_objects.end();){
+        std::cout << "Bajo " << new_object_name << "\n";
+    }
+
+    std::unique_ptr<Object2D> object_2d = std::unique_ptr<Object2D>(object_2d_ptr);
+    m_objects.insert(std::make_pair(object_name, std::move(object_2d)));
+}
+
+void Game::destroy_object(std::string object_name){
+    if (m_objects.find(object_name) == m_objects.end()){
+        return;
+    }
+    m_objects.erase(object_name);
+    std::unique_ptr<Object2D>& object2d = m_objects.at(object_name);
+    object2d.reset();
+}
+
+
+Object2D* Game::get_object(std::string object_name){
+    if (m_objects.find(object_name) == m_objects.end()){
+        return nullptr;
+    }
+    Object2D* object2d = m_objects[object_name].get();
+    return object2d;
+}
+
+void Game::on_object_destroyed(Object2D* object){
+    auto object_pair = std::find_if(
+        m_objects.begin(), m_objects.end(),
+        [&] (std::pair<const std::string, std::unique_ptr<Object2D>>& pair){
+            return pair.second.get() == object;
+        });
+    
+    if (object_pair == m_objects.end()){
+        return;
+    }
+    m_objects.erase(object_pair->first);
+}
+
+
+const std::vector<Object2D*> Game::get_all_objects(){
+    std::vector<Object2D*> all_objects{};
+    for(auto& object_pair: m_objects){
+        Object2D* object_raw_ptr = object_pair.second.get();
+        all_objects.push_back(object_raw_ptr);
+    }
+    return all_objects;
+}
+
+
+
 void Game::start()
 {
     std::cout << "Game started in directory: " << std::filesystem::current_path() << "\n";
@@ -125,25 +178,30 @@ void Game::start()
     fonts.push_back(font);
 
 
-    TextImage* text_image = new TextImage("Hello, world!", fonts[0], {}, Vector2<int>{100, 20}, Vector3<uint8_t>{0}, 255);
-    Image* image = new Image("assets/images/preview.png", {100}, {200, 150});
-    AnimatedImage* animated_image = new AnimatedImage("assets/images/foo.png", {200, 400}, {64, 205}, 4);
+    register_object("HelloText",
+        new TextImage("Hello, world!", fonts[0], Vector2<float>{}, Vector2<int>{100, 20}, Vector3<uint8_t>{0}, 255)
+    );
+        
+    register_object("Preview",
+        new Image("assets/images/preview.png", {100}, {200, 150}));
+    register_object("Animation",
+        new AnimatedImage("assets/images/foo.png", {200, 400}, {64, 205}, 4));
 
-    objects.push_back(animated_image);
-    objects.push_back(image);
-    objects.push_back(text_image);
 
-    Button* button = new Button("Button!", true, {200, 64});
-    objects.push_back(button);
+    register_object("Button",
+        new Button("Button!", true, {64, 64}));
 
-    objects.push_back(
-        new Breakout::BallEntity(Vector2<float>{100, 400})
+    register_object("Ball",
+         new Breakout::BallEntity(Vector2<float>{100, 400})
     );
 
-    objects.push_back(
-        new Breakout::Paddle(Vector2<float>{m_window_width/2, m_window_height - 50})
-    );
-
+    Vector2<int> window_size = m_main_window->get_window_size();
+    Vector2<float> paddle_pos = {
+         static_cast<float>(window_size.x)/2.f,
+         static_cast<float>(window_size.y) - 50.f
+    };
+    
+    register_object("Paddle", new Breakout::Paddle(paddle_pos));
 }
 
 void Game::process_input()
@@ -151,7 +209,7 @@ void Game::process_input()
     SDL_Event& event = input.update();
     m_is_running = !input.is_quit_requested();
     
-    for (Object2D* object: objects){
+    for (Object2D* object: get_all_objects()){
         object->handle_event(event);
     }
 }
@@ -166,48 +224,34 @@ void Game::update()
 
     std::stringstream delta_text{""};
     delta_text << "Avg FPS: " << avg_fps;
-    TextImage* text_image = dynamic_cast<TextImage*>(objects[2]);
+    TextImage* text_image = dynamic_cast<TextImage*>(get_object("HelloText"));
     text_image->set_text(delta_text.str());
 
     float delta_time = m_step_timer.get_ticks_sec();
-    for(Object2D* object: objects){
+    for (Object2D* object: get_all_objects()){
         object->process(delta_time);
     }
-
-    // if (!images.empty()){
-    //     images[0]->set_size(get_screen_surface_size());
-    // }
 
 }
 
 void Game::render()
 {
     // drawing
-    SDL_RenderClear(m_renderer);
+    m_main_window->clear_renderer();
 
-    for (Object2D* object: objects){
-        object->render(m_renderer);
+    for (Object2D* object: get_all_objects()){
+        object->render(*m_main_window.get());
     }
 
-    SDL_RenderPresent(m_renderer);
+    m_main_window->update_renderer();
     ++m_counted_frames;
 }
 
-bool Game::init(const char* title)
+bool Game::init(const char* title, Vector2<int> size)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         std::cerr << "SDL couldn't initialize! SDL_Error: " << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    m_window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        m_window_width, m_window_height, 
-        SDL_WINDOW_SHOWN);
-    
-    if (m_window == NULL){
-        std::cerr << "Window couldn't be created! SDL_Error: " << SDL_GetError() << std::endl;
         return false;
     }
 
@@ -217,40 +261,24 @@ bool Game::init(const char* title)
         return false;
     }
 
-    m_renderer = SDL_CreateRenderer(m_window, -1,
-        SDL_RENDERER_ACCELERATED);
-    if (m_renderer == NULL){
-        std::cerr << "Renderer couldn't be created! SDL_Error:" << SDL_GetError() << std::endl;
-        return false;
-    }
-    SDL_SetRenderDrawColor(m_renderer, 0xff, 0xff, 0xff, 0xff);
-
     if (TTF_Init() < 0)
     {
         std::cerr << "SDL_ttf couldn't initialize! TTF_Error: " << TTF_GetError() << std::endl;
         return false;
     }
 
+    m_main_window = std::make_unique<Window>(title, size);
+    
     return true;
 }
 
 void Game::clear()
 {
-    for (Object2D* object: objects)
-    {
-        delete object;
-    }
-
     TTF_CloseFont(Engine::default_font);
     for (TTF_Font* font_ptr: fonts)
     {
         TTF_CloseFont(font_ptr);
     }
-
-    SDL_FreeSurface(m_screen_surface);
-    SDL_DestroyWindow(m_window);
-    m_window = NULL;
-    m_screen_surface = NULL;
 
     TTF_Quit();
     IMG_Quit();

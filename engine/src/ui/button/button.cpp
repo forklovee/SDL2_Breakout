@@ -1,6 +1,7 @@
 #include "ui/button/button.h"
 #include "core/game.h"
 #include "core/input.h"
+#include "core/window.h"
 #include "graphics/object2d.h"
 
 #include <SDL_render.h>
@@ -28,7 +29,7 @@ Button::~Button()
 
 }
 
-void Button::render(SDL_Renderer* m_renderer)
+void Button::render(Window& target_window)
 {
   Vector3<uint8_t>& target_color = get_is_pressed() ? m_pressed_color : m_default_color;
   uint8_t& target_alpha = get_is_pressed() ? m_pressed_alpha : m_default_alpha;
@@ -49,13 +50,15 @@ void Button::render(SDL_Renderer* m_renderer)
         target_color = m_hover_color;
         target_alpha = m_hover_alpha;
         break;
+      default:
+        break;
     }
   }
 
   m_background_image.set_color(target_color, target_alpha);
 
-  m_background_image.render(m_renderer);
-  m_button_text_image.render(m_renderer);
+  m_background_image.render(target_window);
+  m_button_text_image.render(target_window);
 }
 
 void Button::handle_event(const SDL_Event& event){

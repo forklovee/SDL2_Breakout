@@ -1,12 +1,14 @@
 #pragma once
 
 #include "core/timing.h"
+#include "core/window.h"
 #include "graphics/object2d.h"
 #include "math/vector.h"
 
-#include "SDL2/SDL_surface.h"
-#include "SDL_render.h"
 #include <SDL_ttf.h>
+#include <memory>
+#include <unordered_map>
+#include <string>
 #include <vector>
 
 namespace Engine{
@@ -20,13 +22,18 @@ extern TTF_Font* default_font;
 // extern const TTF_Font* default_font;
 
 class Game{
+
 public:
     Game(const char* title, int window_height, int window_width);
     ~Game();
 
     void run();
 
-    Vector2<int> get_screen_surface_size() const; 
+#pragma region Window
+
+    const Window& create_window(std::string name, Vector2<int> size, Vector2<int> position);
+
+#pragma endregion Window
 
 #pragma region FPS
 
@@ -38,6 +45,11 @@ public:
 
 #pragma endregion FPS
 
+    void register_object(std::string object_name, Object2D* object_2d_ptr);
+    void destroy_object(std::string object_name);
+    Object2D* get_object(std::string object_name);
+    void on_object_destroyed(Object2D* object);
+
 private:
     void start();
 
@@ -45,18 +57,16 @@ private:
     void update();
     void render();
 
-    bool init(const char* title);
+    bool init(const char* title, Vector2<int> size);
     void clear();
 
     const int get_screen_ticks_per_frame();
 
+    const std::vector<Object2D*> get_all_objects();
+
 private:
-    SDL_Window* m_window;
-    SDL_Renderer* m_renderer;
-    SDL_Surface* m_screen_surface;
     bool m_is_running;
-    int m_window_height;
-    int m_window_width;
+    std::unique_ptr<Window> m_main_window;
 
     Timer m_timer;
     uint32_t m_counted_frames;
@@ -68,7 +78,7 @@ private:
     uint16_t m_fps_cap;
 
     std::vector<TTF_Font*> fonts;
-    std::vector<Object2D*> objects;
+    std::unordered_map<std::string, std::unique_ptr<Object2D>> m_objects;
 
 };
 
