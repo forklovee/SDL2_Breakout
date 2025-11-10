@@ -34,6 +34,11 @@ public:
     const Vector2<int>& get_size() const;
     virtual void set_size(const Vector2<int>& size);
 
+    Vector2<int> get_center_position() const;
+
+    const bool& is_visible() const;
+    virtual void set_visible(const bool& is_visible);
+
     const SDL_Point& get_pivot_point() const;
     virtual void set_pivot_point(const SDL_Point& pivot_point);
 
@@ -49,6 +54,7 @@ public:
 protected:
     Vector2<float> m_position{};
     Vector2<int> m_size{};
+    bool m_visible;
 
     SDL_Point m_pivot_point{};
     double m_rotation{0.0};

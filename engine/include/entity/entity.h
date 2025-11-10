@@ -1,0 +1,28 @@
+#pragma once
+
+#include "graphics/object2d.h"
+#include "math/vector.h"
+
+#include <vector>
+#include <SDL_rect.h>
+
+namespace Engine{
+    
+class Entity: public Object2D{
+
+public:
+    Entity(Vector2<float> position = {}, Vector2<int> size = {64});
+
+    virtual void physics_process(float delta_time, const std::vector<Entity*>& colliders) = 0;
+
+    void move(Vector2<float> offset);
+
+    const bool is_colliding_with(const Entity& other_entity);
+    const SDL_Rect get_collision_bounds() const;
+
+protected:
+    bool m_collision_enabled;
+
+};
+
+}

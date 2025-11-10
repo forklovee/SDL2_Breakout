@@ -3,6 +3,7 @@
 #include "core/input.h"
 #include "core/window.h"
 #include "entity/ball_entity.h"
+#include "entity/entity.h"
 #include "entity/paddle_entity.h"
 #include "graphics/image/image.h"
 #include "graphics/image/text_image.h"
@@ -105,13 +106,18 @@ const int Game::get_screen_ticks_per_frame() {
 
 
 void Game::register_object(std::string object_name, Object2D* object_2d_ptr){
-    
-    for(std::string new_object_name = object_name; m_objects.find(object_name) != m_objects.end();){
-        std::cout << "Bajo " << new_object_name << "\n";
+    if (Entity* entity = dynamic_cast<Entity*>(object_2d_ptr)){
+        register_entity(object_name, entity);
+        return;
     }
 
     std::unique_ptr<Object2D> object_2d = std::unique_ptr<Object2D>(object_2d_ptr);
     m_objects.insert(std::make_pair(object_name, std::move(object_2d)));
+}
+
+void Game::register_entity(std::string entity_name, Entity* entity_ptr){
+    std::unique_ptr<Entity> entity = std::unique_ptr<Entity>(entity_ptr);
+    m_entities.insert(std::make_pair(entity_name, std::move(entity)));
 }
 
 void Game::destroy_object(std::string object_name){
@@ -155,14 +161,22 @@ const std::vector<Object2D*> Game::get_all_objects(){
     return all_objects;
 }
 
+const std::vector<Entity*> Game::get_all_entities(){
+    std::vector<Entity*> all_entities{};
+    for(auto& object_pair: m_entities){
+        Entity* entity_raw_ptr = object_pair.second.get();
+        all_entities.push_back(entity_raw_ptr);
+    }
+    Breakout::Paddle* entity_raw_ptr = paddle.get();
+    all_entities.push_back(paddle.get());
+    return all_entities;
+}
 
 
 void Game::start()
 {
     std::cout << "Game started in directory: " << std::filesystem::current_path() << "\n";
 
-    input.bind_action("up", SDLK_w);    
-    input.bind_action("down", SDLK_s);
     input.bind_action("left", SDLK_a);
     input.bind_action("right", SDLK_d);
 
@@ -177,31 +191,16 @@ void Game::start()
     }
     fonts.push_back(font);
 
-
-    register_object("HelloText",
-        new TextImage("Hello, world!", fonts[0], Vector2<float>{}, Vector2<int>{100, 20}, Vector3<uint8_t>{0}, 255)
-    );
-        
-    register_object("Preview",
-        new Image("assets/images/preview.png", {100}, {200, 150}));
-    register_object("Animation",
-        new AnimatedImage("assets/images/foo.png", {200, 400}, {64, 205}, 4));
-
-
-    register_object("Button",
-        new Button("Button!", true, {64, 64}));
-
-    register_object("Ball",
-         new Breakout::BallEntity(Vector2<float>{100, 400})
-    );
-
-    Vector2<int> window_size = m_main_window->get_window_size();
-    Vector2<float> paddle_pos = {
+    const Vector2<int> window_size = m_main_window->get_window_size();
+    const Vector2<float> paddle_pos = {
          static_cast<float>(window_size.x)/2.f,
          static_cast<float>(window_size.y) - 50.f
     };
-    
-    register_object("Paddle", new Breakout::Paddle(paddle_pos));
+
+    ball = std::make_unique<Breakout::BallEntity>();
+    ball->set_position({100, 400});
+
+    paddle = std::make_unique<Breakout::Paddle>(100.f, paddle_pos);
 }
 
 void Game::process_input()
@@ -209,6 +208,8 @@ void Game::process_input()
     SDL_Event& event = input.update();
     m_is_running = !input.is_quit_requested();
     
+    paddle->handle_event(event);
+
     for (Object2D* object: get_all_objects()){
         object->handle_event(event);
     }
@@ -224,10 +225,14 @@ void Game::update()
 
     std::stringstream delta_text{""};
     delta_text << "Avg FPS: " << avg_fps;
-    TextImage* text_image = dynamic_cast<TextImage*>(get_object("HelloText"));
-    text_image->set_text(delta_text.str());
 
     float delta_time = m_step_timer.get_ticks_sec();
+
+    std::vector<Entity*> entities = get_all_entities();
+
+    ball->physics_process(delta_time, entities);
+    paddle->process(delta_time);
+
     for (Object2D* object: get_all_objects()){
         object->process(delta_time);
     }
@@ -239,7 +244,11 @@ void Game::render()
     // drawing
     m_main_window->clear_renderer();
 
+    ball->render(*m_main_window.get());
+    paddle->render(*m_main_window.get());
+
     for (Object2D* object: get_all_objects()){
+        if (!object->is_visible()) continue;
         object->render(*m_main_window.get());
     }
 

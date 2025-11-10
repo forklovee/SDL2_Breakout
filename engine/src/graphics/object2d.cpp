@@ -8,7 +8,7 @@
 namespace Engine{
 
 Object2D::Object2D(Vector2<float> position, Vector2<int> size) :
-    m_position(position), m_size(size), m_process_events{false}
+    m_position(position), m_size(size), m_visible{true}, m_process_events{false}
 {
 
 }
@@ -93,6 +93,19 @@ void Object2D::set_size(const Vector2<int>& size)
         abs(size.x),
         abs(size.x),
     };
+}
+
+Vector2<int> Object2D::get_center_position() const{
+    return Vector2<int>(get_position()) + get_size()/2;
+}
+
+
+const bool& Object2D::is_visible() const{
+    return m_visible;
+}
+
+void Object2D::set_visible(const bool& is_visible){
+    m_visible = !is_visible;
 }
 
 const SDL_Point& Object2D::get_pivot_point() const

@@ -14,16 +14,12 @@ struct Vector2 {
     Vector2(T xy) : x(xy), y(xy) {};
     Vector2(T x, T y) : x(x), y(y) {};
 
-    bool is_zero() const {
-        return static_cast<int>(x) == 0 && static_cast<int>(y) == 0;
-    }
-
     template<typename U, typename = typename std::enable_if<std::is_arithmetic<U>::value>::type>
     explicit constexpr Vector2(const Vector2<U>& other_vec)
         : x(static_cast<T>(other_vec.x)), y(static_cast<T>(other_vec.y)) 
         {}
 
-
+    #pragma region Operators
     Vector2 operator+(const Vector2& other_vec) const {
         return {x + other_vec.x, y + other_vec.y};
     }
@@ -32,6 +28,10 @@ struct Vector2 {
         x += other_vec.x;
         y += other_vec.y;
         return *this;
+    }
+
+    Vector2 operator-() const {
+        return {-x, -y};
     }
 
     Vector2 operator-(const Vector2& other_vec) const {
@@ -89,6 +89,30 @@ struct Vector2 {
         y /= other_vec.y;
         return *this;
     }
+    #pragma endregion Operators
+
+    #pragma region Utility
+    bool is_zero() const {
+        return static_cast<int>(x) == 0 && static_cast<int>(y) == 0;
+    }
+
+    const float length(){
+        return std::sqrt(x*x + y*y);
+    }
+
+    const Vector2 direction() const{
+        const float lenght = std::sqrt(x*x + y*y);
+        return Vector2{x/lenght, y/lenght};
+    }
+
+    const Vector2 direction_to(Vector2& other_vec){
+        Vector2 offset = other_vec;
+        offset.x -= x;
+        offset.y -= y;
+        offset = offset.direction();
+        return offset;
+    }
+    #pragma endregion Utility
 
     friend std::ostream& operator<<(std::ostream& os, const Vector2& v) {
         return os << "(" << v.x << ", " << v.y << ")";

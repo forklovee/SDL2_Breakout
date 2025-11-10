@@ -12,6 +12,7 @@ namespace Engine{
 
 class Window{
 public:
+    Window() = default;
     Window(std::string window_name, Vector2<int> size, Vector2<int> position = {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED});
     ~Window();
 

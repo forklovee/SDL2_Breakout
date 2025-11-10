@@ -14,6 +14,8 @@ target_sources(engine PRIVATE
     src/graphics/image/text_image.cpp
     src/ui/button/button.cpp
 
+    src/entity/entity.cpp
+
     src/entity/ball_entity.cpp
     src/entity/paddle_entity.cpp
 )
