@@ -19,6 +19,9 @@ public:
 
     virtual void set_position(const Vector2<float>& position) override;
 
+protected:
+    void on_collision(Engine::Entity* entity) override;
+
 private:
     Vector2<int> m_movement_direction;
     float m_speed;

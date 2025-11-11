@@ -197,7 +197,7 @@ void Game::start()
          static_cast<float>(window_size.y) - 50.f
     };
 
-    ball = std::make_unique<Breakout::BallEntity>();
+    ball = std::make_unique<Breakout::BallEntity>(50.f);
     ball->set_position({100, 400});
 
     paddle = std::make_unique<Breakout::Paddle>(100.f, paddle_pos);
@@ -231,6 +231,8 @@ void Game::update()
     std::vector<Entity*> entities = get_all_entities();
 
     ball->physics_process(delta_time, entities);
+    ball->process(delta_time);
+
     paddle->process(delta_time);
 
     for (Object2D* object: get_all_objects()){

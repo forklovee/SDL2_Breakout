@@ -1,6 +1,7 @@
 #include "entity/entity.h"
 #include "graphics/object2d.h"
 #include <SDL_rect.h>
+#include <iostream>
 
 namespace Engine{
 
@@ -11,10 +12,24 @@ Entity::Entity(Vector2<float> position, Vector2<int> size)
 
 }
 
+void Entity::physics_process(float delta_time, const std::vector<Entity*>& colliders){
+    for (Entity* entity: colliders){
+        const SDL_Rect& collider_bounds = entity->get_collision_bounds();
+
+        if (is_colliding_with(*entity))
+        {
+            on_collision(entity);
+        }
+    }
+}
+
+void Entity::on_collision(Entity* other_entity){
+    std::cout << "Entity(" << this << ")" << " collided with " << other_entity << "\n";
+}
+
 void Entity::move(Vector2<float> offset){
     set_position(get_position() + offset);
 }
-
 
 const bool Entity::is_colliding_with(const Entity& other_entity){
     if (!m_collision_enabled){
@@ -26,8 +41,8 @@ const bool Entity::is_colliding_with(const Entity& other_entity){
 
     if (this_collider.x + this_collider.w >= other_entity_collider.x &&
         this_collider.x <= other_entity_collider.x + other_entity_collider.w &&
-        this_collider.y - this_collider.h <= other_entity_collider.y &&
-        this_collider.y >= other_entity_collider.y - other_entity_collider.h)
+        this_collider.y + this_collider.h >= other_entity_collider.y &&
+        this_collider.y <= other_entity_collider.y + other_entity_collider.h)
     {
         return true;
     }
@@ -38,6 +53,10 @@ const bool Entity::is_colliding_with(const Entity& other_entity){
 
 const SDL_Rect Entity::get_collision_bounds() const{
     return get_transform();
+}
+
+void Entity::destroy(){
+    delete this;
 }
 
 }

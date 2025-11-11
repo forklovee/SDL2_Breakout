@@ -25,53 +25,47 @@ void BallEntity::render(Engine::Window& target_window){
 }
 
 void BallEntity::process(float delta_time){
-    
 }
 
 void BallEntity::physics_process(float delta_time, const std::vector<Entity*>& colliders){
-    Vector2<float> movement_offset = Vector2<float>(m_movement_direction) * m_speed * delta_time;
 
-    Vector2<float> next_position = get_position() + movement_offset;
-    if (next_position.x <= 0.0 || next_position.x + m_size.x >= m_screen_corners.w)
+    if (m_position.x <= 0.0 || m_position.x + m_size.x >= m_screen_corners.w)
     {
-        movement_offset.x = -movement_offset.x;
         m_movement_direction.x = -m_movement_direction.x;
     }
-    if (next_position.y <= 0.0)
+    if (m_position.y <= 0.0)
     {
-        movement_offset.y = -movement_offset.y;
         m_movement_direction.y = -m_movement_direction.y;
     }
 
-    if (next_position.y + m_size.y >= m_screen_corners.h){
+    if (m_position.y + m_size.y >= m_screen_corners.h){
         // Out of screen. Game over? Life --?
     }
 
-    for (Entity* entity: colliders){
-        const SDL_Rect& collider_bounds = entity->get_collision_bounds();
+    Engine::Entity::physics_process(delta_time, colliders);
 
-        if (entity->is_colliding_with(*this))
-        {
-            Vector2<int> entity_center = {collider_bounds.x + collider_bounds.w/2, collider_bounds.y + collider_bounds.h/2};
-            Vector2<int> center = get_center_position();
-            Vector2<int> direction_to_ball = entity_center.direction_to(center);
-
-            if (std::abs(direction_to_ball.x) > std::abs(direction_to_ball.y)){
-                movement_offset.x = -movement_offset.x;
-                m_movement_direction.x = -m_movement_direction.x;
-            }
-            else{
-                movement_offset.y = -movement_offset.y;
-                m_movement_direction.y = -m_movement_direction.y;
-            }
-
-            break;
-        }
-    }
-
+    Vector2<float> movement_offset = Vector2<float>(m_movement_direction) * m_speed * delta_time;
     move(movement_offset);
 }
 
+void BallEntity::on_collision(Engine::Entity* entity){
+    Engine::Entity::on_collision(entity);
+    
+    const SDL_Rect& collider_bounds = entity->get_collision_bounds();
+    Vector2<int> entity_center = {collider_bounds.x + collider_bounds.w/2, collider_bounds.y + collider_bounds.h/2};
+    Vector2<int> center = get_center_position();
+    Vector2<int> direction_to_ball = entity_center.direction_to(center);
+
+    if (std::abs(direction_to_ball.x) > std::abs(direction_to_ball.y)){
+        m_movement_direction.x = -m_movement_direction.x;
+    }
+    else{
+        m_movement_direction.y = -m_movement_direction.y;
+    }
+
+    std::cout << "col[ pos:" << entity->get_position() << " size:" << entity->get_size() << "]\n";
+    std::cout << "ball[ pos:" << get_position() << " size:" << get_size() << "]\n";
+}
 
 void BallEntity::set_position(const Vector2<float>& position){
     Engine::Object2D::set_position(position);

@@ -5,6 +5,7 @@
 #include "core/input.h"
 
 #include <cmath>
+#include <iostream>
 
 namespace Breakout{
 
@@ -33,6 +34,7 @@ void Paddle::process(float delta_time){
         return;
     }
     set_position(target_position);
+
 }
 
 void Paddle::physics_process(float delta_time, const std::vector<Engine::Entity*>& colliders){
