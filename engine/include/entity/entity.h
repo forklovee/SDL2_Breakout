@@ -21,8 +21,6 @@ public:
     const bool is_colliding_with(const Entity& other_entity);
     const SDL_Rect get_collision_bounds() const;
 
-    virtual void destroy();
-
 protected:
     virtual void on_collision(Entity* other_entity);
 

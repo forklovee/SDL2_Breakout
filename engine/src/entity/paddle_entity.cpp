@@ -4,10 +4,6 @@
 #include "graphics/image/image.h"
 #include "core/input.h"
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-
 namespace Breakout{
 
 Paddle::Paddle(float speed, Vector2<float> position, Vector2<int> size)

@@ -10,6 +10,8 @@ class BlockEntity: public Engine::Entity{
 public:
     BlockEntity(Vector2<float> position = {}, Vector2<int> size = {64, 32});
 
+    virtual void render(Engine::Window& target_window) override;
+
     void set_color(Vector3<uint8_t> color, uint8_t alpha);
 
 protected:

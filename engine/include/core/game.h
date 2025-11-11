@@ -51,9 +51,11 @@ public:
 
     Object2D* register_object(const std::string& name, std::unique_ptr<Object2D>&& object_2d_ptr);
     void remove_object(const std::string& name);
+    void remove_object(Object2D* object_2d_ptr);
     
     Entity* register_entity(const std::string& name, std::unique_ptr<Entity>&& entity_ptr);
     void remove_entity(const std::string& name);
+    void remove_entity(Entity* entity_ptr);
 
 private:
     void start();

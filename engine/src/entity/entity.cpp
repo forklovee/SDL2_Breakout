@@ -60,8 +60,4 @@ const SDL_Rect Entity::get_collision_bounds() const{
     return get_transform();
 }
 
-void Entity::destroy(){
-    delete this;
-}
-
 }

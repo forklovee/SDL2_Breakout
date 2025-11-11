@@ -101,8 +101,8 @@ struct Vector2 {
     }
 
     const Vector2 direction() const{
-        const float lenght = std::sqrt(x*x + y*y);
-        return Vector2{x/lenght, y/lenght};
+        const float length = std::sqrt(x*x + y*y);
+        return Vector2{x/length, y/length};
     }
 
     const Vector2 direction_to(Vector2& other_vec){

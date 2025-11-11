@@ -8,7 +8,8 @@
 namespace Engine{
 
 Object2D::Object2D(Vector2<float> position, Vector2<int> size) :
-    m_position(position), m_size(size), m_visible{true}, m_process_events{false}
+    m_position(position), m_size(size), m_marked_for_deletion{false},
+    m_visible{true}, m_process_events{false}
 {
 
 }
@@ -17,6 +18,16 @@ Object2D::~Object2D()
 {
 
 }
+
+const bool Object2D::is_valid() const{
+    return !m_marked_for_deletion;
+}
+
+
+void Object2D::destroy(){
+    m_marked_for_deletion = true;
+}
+
 
 void Object2D::render(Window& target_window)
 {

@@ -22,6 +22,9 @@ public:
     Object2D(Vector2<float> position = {}, Vector2<int> size = {64});
     virtual ~Object2D();
 
+    const bool is_valid() const;
+    void destroy();
+
     virtual void render(Window& target_window);
     virtual void process(float delta_time);
     virtual void handle_event(const SDL_Event& event);
@@ -52,9 +55,11 @@ public:
     virtual void set_process_events(const bool& process_events);
 
 protected:
+    bool m_marked_for_deletion{false};
+
     Vector2<float> m_position{};
     Vector2<int> m_size{};
-    bool m_visible;
+    bool m_visible{true};
 
     SDL_Point m_pivot_point{};
     double m_rotation{0.0};

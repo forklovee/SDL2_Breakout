@@ -13,7 +13,7 @@
 namespace Breakout {
 
 BallEntity::BallEntity(float speed, Vector2<float> position, Vector2<int> size)
-    : Engine::Entity(position, size), m_movement_direction(Vector2<int>{-1, 1}), m_speed(speed),
+    : Engine::Entity(position, size), m_movement_direction(Vector2<int>{-1, -1}), m_speed(speed),
     m_ball_sprite("assets/images/Ball.png", position, size)
 {
     m_ball_sprite.set_color({255, 0, 0}, 255);
