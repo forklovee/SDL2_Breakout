@@ -3,22 +3,20 @@
 #include "core/input.h"
 #include "core/window.h"
 #include "entity/ball_entity.h"
+#include "entity/block_entity.h"
 #include "entity/entity.h"
 #include "entity/paddle_entity.h"
-#include "graphics/image/image.h"
-#include "graphics/image/text_image.h"
 #include "graphics/object2d.h"
 #include "math/vector.h"
-#include "graphics/image/animated_image.h"
 
 #include "SDL_error.h"
 #include "SDL_events.h"
 #include "SDL_image.h"
-#include "ui/button/button.h"
 #include <SDL_keycode.h>
 #include <SDL_stdinc.h>
 #include <SDL_ttf.h>
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <memory>
@@ -26,6 +24,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -105,73 +104,57 @@ const int Game::get_screen_ticks_per_frame() {
 }
 
 
-void Game::register_object(std::string object_name, Object2D* object_2d_ptr){
-    if (Entity* entity = dynamic_cast<Entity*>(object_2d_ptr)){
-        register_entity(object_name, entity);
-        return;
+Object2D* Game::register_object(const std::string& name, std::unique_ptr<Object2D>&& object_2d_ptr){
+    Object2D* raw_object_ptr = object_2d_ptr.get();
+    m_objects.push_back(std::move(object_2d_ptr));
+    m_object_lookup_map.emplace(name, raw_object_ptr);
+    return raw_object_ptr;
+}
+
+void Game::remove_object(const std::string& name){
+    auto object_map_it = m_object_lookup_map.find(name);
+    if (object_map_it == m_object_lookup_map.end()){
+        return; //object of name not found.
     }
 
-    std::unique_ptr<Object2D> object_2d = std::unique_ptr<Object2D>(object_2d_ptr);
-    m_objects.insert(std::make_pair(object_name, std::move(object_2d)));
+    Object2D* object_ptr = object_map_it->second;
+
+    // remove unique_ptr from vector -> Destroy the object.
+    m_objects.erase(
+        std::remove_if(m_objects.begin(), m_objects.begin(),
+            [object_ptr](const auto& o) { return o.get() == object_ptr;}
+        )
+    );
+
+    // remove from lookup map
+    m_object_lookup_map.erase(object_map_it);
 }
 
-void Game::register_entity(std::string entity_name, Entity* entity_ptr){
-    std::unique_ptr<Entity> entity = std::unique_ptr<Entity>(entity_ptr);
-    m_entities.insert(std::make_pair(entity_name, std::move(entity)));
+Entity* Game::register_entity(const std::string& name, std::unique_ptr<Entity>&& entity_ptr){
+    Entity* raw_entity_ptr = entity_ptr.get();
+    m_entities.push_back(std::move(entity_ptr));
+    m_entity_lookup_map.emplace(name, raw_entity_ptr);
+    return raw_entity_ptr;
 }
 
-void Game::destroy_object(std::string object_name){
-    if (m_objects.find(object_name) == m_objects.end()){
-        return;
+void Game::remove_entity(const std::string& name){
+    auto entity_map_it = m_entity_lookup_map.find(name);
+    if (entity_map_it == m_entity_lookup_map.end()){
+        return; //object of name not found.
     }
-    m_objects.erase(object_name);
-    std::unique_ptr<Object2D>& object2d = m_objects.at(object_name);
-    object2d.reset();
+
+    Entity* entity_ptr = entity_map_it->second;
+
+    // remove unique_ptr from vector -> Destroy the object.
+    m_entities.erase(
+        std::remove_if(m_entities.begin(), m_entities.begin(),
+            [entity_ptr](const auto& e) { return e.get() == entity_ptr;}
+        )
+    );
+
+    // remove from lookup map
+    m_entity_lookup_map.erase(entity_map_it);
 }
-
-
-Object2D* Game::get_object(std::string object_name){
-    if (m_objects.find(object_name) == m_objects.end()){
-        return nullptr;
-    }
-    Object2D* object2d = m_objects[object_name].get();
-    return object2d;
-}
-
-void Game::on_object_destroyed(Object2D* object){
-    auto object_pair = std::find_if(
-        m_objects.begin(), m_objects.end(),
-        [&] (std::pair<const std::string, std::unique_ptr<Object2D>>& pair){
-            return pair.second.get() == object;
-        });
-    
-    if (object_pair == m_objects.end()){
-        return;
-    }
-    m_objects.erase(object_pair->first);
-}
-
-
-const std::vector<Object2D*> Game::get_all_objects(){
-    std::vector<Object2D*> all_objects{};
-    for(auto& object_pair: m_objects){
-        Object2D* object_raw_ptr = object_pair.second.get();
-        all_objects.push_back(object_raw_ptr);
-    }
-    return all_objects;
-}
-
-const std::vector<Entity*> Game::get_all_entities(){
-    std::vector<Entity*> all_entities{};
-    for(auto& object_pair: m_entities){
-        Entity* entity_raw_ptr = object_pair.second.get();
-        all_entities.push_back(entity_raw_ptr);
-    }
-    Breakout::Paddle* entity_raw_ptr = paddle.get();
-    all_entities.push_back(paddle.get());
-    return all_entities;
-}
-
 
 void Game::start()
 {
@@ -197,10 +180,27 @@ void Game::start()
          static_cast<float>(window_size.y) - 50.f
     };
 
-    ball = std::make_unique<Breakout::BallEntity>(50.f);
-    ball->set_position({100, 400});
+    for (size_t row{0}; row < 4; row++){
+        for (size_t col{0}; col < 8; col++){
+            size_t block_id = col + row*4;
+            std::string block_name = "block"+std::to_string(block_id);
 
-    paddle = std::make_unique<Breakout::Paddle>(100.f, paddle_pos);
+            Vector2<float> block_position = {
+                col * 68.f,
+                row * 36.f
+            };
+
+            std::unique_ptr<Breakout::BlockEntity> block = std::make_unique<Breakout::BlockEntity>(block_position);
+            block->set_color({128}, 255);
+            register_entity(block_name, std::move(block));
+        }
+    }
+
+    register_entity("Ball", std::make_unique<Breakout::BallEntity>(50.f, Vector2<float>{100, 400}));
+    ball = dynamic_cast<Breakout::BallEntity*>(m_entity_lookup_map.at("Ball"));
+
+    register_entity("Paddle", std::make_unique<Breakout::Paddle>(100.f, paddle_pos));
+    paddle = dynamic_cast<Breakout::Paddle*>(m_entity_lookup_map.at("Paddle"));
 }
 
 void Game::process_input()
@@ -210,7 +210,7 @@ void Game::process_input()
     
     paddle->handle_event(event);
 
-    for (Object2D* object: get_all_objects()){
+    for (const auto& object: m_objects){
         object->handle_event(event);
     }
 }
@@ -228,14 +228,12 @@ void Game::update()
 
     float delta_time = m_step_timer.get_ticks_sec();
 
-    std::vector<Entity*> entities = get_all_entities();
-
-    ball->physics_process(delta_time, entities);
+    ball->physics_process(delta_time, m_entities);
     ball->process(delta_time);
 
     paddle->process(delta_time);
 
-    for (Object2D* object: get_all_objects()){
+    for (auto& object: m_objects){
         object->process(delta_time);
     }
 
@@ -249,7 +247,7 @@ void Game::render()
     ball->render(*m_main_window.get());
     paddle->render(*m_main_window.get());
 
-    for (Object2D* object: get_all_objects()){
+    for (auto& object: m_objects){
         if (!object->is_visible()) continue;
         object->render(*m_main_window.get());
     }

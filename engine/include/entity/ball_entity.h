@@ -15,7 +15,7 @@ public:
     virtual void render(Engine::Window& target_window) override;
     virtual void process(float delta_time) override;
 
-    virtual void physics_process(float delta_time, const std::vector<Entity*>& colliders) override;
+    virtual void physics_process(float delta_time, const std::vector<std::unique_ptr<Entity>>& colliders) override;
 
     virtual void set_position(const Vector2<float>& position) override;
 

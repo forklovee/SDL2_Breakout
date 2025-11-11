@@ -8,6 +8,7 @@
 #include <SDL_rect.h>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 namespace Breakout {
 
@@ -27,7 +28,7 @@ void BallEntity::render(Engine::Window& target_window){
 void BallEntity::process(float delta_time){
 }
 
-void BallEntity::physics_process(float delta_time, const std::vector<Entity*>& colliders){
+void BallEntity::physics_process(float delta_time, const std::vector<std::unique_ptr<Engine::Entity>>& colliders){
 
     if (m_position.x <= 0.0 || m_position.x + m_size.x >= m_screen_corners.w)
     {

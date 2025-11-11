@@ -12,13 +12,18 @@ Entity::Entity(Vector2<float> position, Vector2<int> size)
 
 }
 
-void Entity::physics_process(float delta_time, const std::vector<Entity*>& colliders){
-    for (Entity* entity: colliders){
+void Entity::physics_process(float delta_time, const std::vector<std::unique_ptr<Entity>>& colliders){
+    for (const auto& entity: colliders){
+        if (entity.get() == this){ //omit self
+            continue;
+        }
+
         const SDL_Rect& collider_bounds = entity->get_collision_bounds();
 
         if (is_colliding_with(*entity))
         {
-            on_collision(entity);
+            entity->on_collision(this);
+            this->on_collision(entity.get());
         }
     }
 }

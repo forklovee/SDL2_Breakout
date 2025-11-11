@@ -4,6 +4,7 @@
 #include "graphics/image/image.h"
 #include "core/input.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -11,7 +12,7 @@ namespace Breakout{
 
 Paddle::Paddle(float speed, Vector2<float> position, Vector2<int> size)
     : Engine::Entity(position - size.x*.5, size), 
-    m_speed(speed), m_input_direction(0), m_center_pos_x(m_position.x),
+    m_speed(speed), m_input_direction(0), m_window_width(0),
     m_paddle_image("assets/images/Paddle.png", m_position, m_size),
     m_collision_shape({0, 0, size.x, size.y})
 {
@@ -20,6 +21,8 @@ Paddle::Paddle(float speed, Vector2<float> position, Vector2<int> size)
 
 
 void Paddle::render(Engine::Window& target_window){
+    m_window_width = target_window.get_window_size().x;
+
     m_paddle_image.render(target_window);
 }
 
@@ -27,17 +30,12 @@ void Paddle::render(Engine::Window& target_window){
 void Paddle::process(float delta_time){
     float velocity_x = static_cast<float>(m_input_direction) * 100.f * delta_time;
 
-    const Vector2<float> current_position = get_position();
-    const Vector2<float> target_position = get_position() + Vector2<float>{velocity_x, 0.f};
+    Vector2<float> target_position = get_position() + Vector2<float>{velocity_x, 0.f};
 
-    if (abs(target_position.x - m_center_pos_x) > 130){
-        return;
-    }
+    target_position.x = (target_position.x > 0.0) ? target_position.x : 0.0;
+    target_position.x = (target_position.x < m_window_width - m_size.x) ? target_position.x : m_window_width - m_size.x;
+
     set_position(target_position);
-
-}
-
-void Paddle::physics_process(float delta_time, const std::vector<Engine::Entity*>& colliders){
 
 }
 
