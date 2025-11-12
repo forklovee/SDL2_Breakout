@@ -3,31 +3,31 @@
 #include "entity/entity.h"
 #include "graphics/image/image.h"
 #include <SDL_rect.h>
-#include <memory>
 
-namespace Breakout{
+namespace Breakout {
 
-class Paddle: public Engine::Entity{
+class Paddle : public Engine::Entity {
 public:
-    Paddle(float speed, Vector2<float> position = {}, Vector2<int> size = {128, 32});
+  Paddle(float speed, Vector2<float> position = {},
+         Vector2<int> size = {128, 32});
 
-    virtual void render(Engine::Window& target_window) override;
-    virtual void process(float delta_time) override;
+  virtual void render(Engine::Window &target_window) override;
+  virtual void process(float delta_time) override;
 
-    virtual void handle_event(const SDL_Event& event) override;
+  virtual void handle_event(const SDL_Event &event) override;
 
-    virtual void set_position(const Vector2<float>& position) override;
+  virtual void move(const Vector2<float> &offset) override;
+  virtual void set_position(const Vector2<float> &position) override;
 
 private:
-    float m_window_width;
+  float m_window_width;
 
-    float m_speed;
-    int m_input_direction;
+  float m_speed;
+  int m_input_direction;
 
-    Engine::Image m_paddle_image;
+  Engine::Image m_paddle_image;
 
-    SDL_Rect m_collision_shape;
-
+  SDL_Rect m_collision_shape;
 };
 
-}
+} // namespace Breakout

@@ -56,15 +56,15 @@ void Game::run() {
     update();
     render();
 
-    for (auto& object: m_objects){
-      if (object && object->is_valid()){
+    for (auto &object : m_objects) {
+      if (object && object->is_valid()) {
         continue;
       }
       remove_object(object.get());
     }
 
-    for (auto& entity: m_entities){
-      if (entity && entity->is_valid()){
+    for (auto &entity : m_entities) {
+      if (entity && entity->is_valid()) {
         continue;
       }
       remove_entity(entity.get());
@@ -127,25 +127,26 @@ void Game::remove_object(const std::string &name) {
   m_object_lookup_map.erase(object_map_it);
 }
 
-void Game::remove_object(Object2D* object_2d_ptr){
-  const auto& object_pair = std::find_if(
-    m_object_lookup_map.begin(), m_object_lookup_map.end(),
-    [object_2d_ptr](const auto& object_pair) { return object_2d_ptr == object_pair.second; });
-  
-  if (object_pair != m_object_lookup_map.end()){
+void Game::remove_object(Object2D *object_2d_ptr) {
+  const auto &object_pair =
+      std::find_if(m_object_lookup_map.begin(), m_object_lookup_map.end(),
+                   [object_2d_ptr](const auto &object_pair) {
+                     return object_2d_ptr == object_pair.second;
+                   });
+
+  if (object_pair != m_object_lookup_map.end()) {
     m_object_lookup_map.erase(object_pair);
   }
-  
-  const auto& object = std::find_if(
-    m_objects.begin(), m_objects.end(),
-    [object_2d_ptr](const auto& object_2d) { return object_2d_ptr == object_2d.get(); });
-  
-  if (object != m_objects.end()){
+
+  const auto &object = std::find_if(m_objects.begin(), m_objects.end(),
+                                    [object_2d_ptr](const auto &object_2d) {
+                                      return object_2d_ptr == object_2d.get();
+                                    });
+
+  if (object != m_objects.end()) {
     m_objects.erase(object);
   }
-
 }
-
 
 Entity *Game::register_entity(const std::string &name,
                               std::unique_ptr<Entity> &&entity_ptr) {
@@ -172,25 +173,25 @@ void Game::remove_entity(const std::string &name) {
   m_entity_lookup_map.erase(entity_map_it);
 }
 
-void Game::remove_entity(Entity* entity_ptr){
-  const auto& entity_pair = std::find_if(
-    m_entity_lookup_map.begin(), m_entity_lookup_map.end(),
-    [entity_ptr](const auto& entity_pair) { return entity_ptr == entity_pair.second; });
-  
-  if (entity_pair != m_entity_lookup_map.end()){
+void Game::remove_entity(Entity *entity_ptr) {
+  const auto &entity_pair =
+      std::find_if(m_entity_lookup_map.begin(), m_entity_lookup_map.end(),
+                   [entity_ptr](const auto &entity_pair) {
+                     return entity_ptr == entity_pair.second;
+                   });
+
+  if (entity_pair != m_entity_lookup_map.end()) {
     m_entity_lookup_map.erase(entity_pair);
   }
-  
-  const auto& entity = std::find_if(
-    m_entities.begin(), m_entities.end(),
-    [entity_ptr](const auto& entity) { return entity_ptr == entity.get(); });
-  
-  if (entity != m_entities.end()){
+
+  const auto &entity = std::find_if(
+      m_entities.begin(), m_entities.end(),
+      [entity_ptr](const auto &entity) { return entity_ptr == entity.get(); });
+
+  if (entity != m_entities.end()) {
     m_entities.erase(entity);
   }
 }
-
-
 
 void Game::start() {
   std::cout << "Game started in directory: " << std::filesystem::current_path()
@@ -221,9 +222,7 @@ void Game::start() {
       size_t block_id = col + row * 4;
       std::string block_name = "block" + std::to_string(block_id);
 
-      Vector2<float> block_position = {
-        col * 128.f,
-        row * 68.f};
+      Vector2<float> block_position = {col * 128.f, row * 68.f};
 
       std::unique_ptr<Breakout::BlockEntity> block =
           std::make_unique<Breakout::BlockEntity>(block_position);
@@ -236,8 +235,8 @@ void Game::start() {
                               200.f, Vector2<float>{100, 400}));
   ball = dynamic_cast<Breakout::BallEntity *>(m_entity_lookup_map.at("Ball"));
 
-  register_entity("Paddle",
-                  std::make_unique<Breakout::Paddle>(100.f, paddle_pos));
+  register_entity("Paddle",std::make_unique<Breakout::Paddle>(
+                              200.f, paddle_pos));
   paddle = dynamic_cast<Breakout::Paddle *>(m_entity_lookup_map.at("Paddle"));
 }
 
@@ -268,14 +267,14 @@ void Game::update() {
   ball->process(delta_time);
 
   for (auto &entity : m_entities) {
-    if (!entity){
+    if (!entity) {
       continue;
     }
     entity->process(delta_time);
   }
 
   for (auto &object : m_objects) {
-    if (!object){
+    if (!object) {
       continue;
     }
     object->process(delta_time);
